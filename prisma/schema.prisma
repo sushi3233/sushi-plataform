@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VideoStatus {
+  DRAFT
+  PUBLISHED
+  DMCA_REMOVED
+
+  @@map("video_status")
+}
+
+model Video {
+  id String @id @default(cuid())
+
+  slug            String @unique
+  metaTitle       String @map("meta_title") @db.VarChar(60)
+  metaDescription String @map("meta_description") @db.VarChar(160)
+  h1Title         String @map("h1_title") @db.VarChar(100)
+
+  duration Int
+  views    Int         @default(0)
+  status   VideoStatus @default(DRAFT)
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  publishedAt DateTime? @map("published_at")
+
+  embed      VideoEmbed?
+  thumbnail  VideoThumbnail?
+  models     Model[]         @relation("VideoModels")
+  categories Category[]      @relation("VideoCategories")
+  tags       Tag[]           @relation("VideoTags")
+  dailyViews DailyView[]
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([views(sort: Desc)])
+  @@index([slug])
+  @@map("videos")
+}
+
+model VideoEmbed {
+  id      String @id @default(cuid())
+  videoId String @unique @map("video_id")
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  hlsUrl    String @map("hls_url")
+  iframeUrl String @map("iframe_url")
+
+  sourcePlatform String  @default("vazounudes") @map("source_platform")
+  sourceId       String  @map("source_id")
+  sourceUrl      String? @map("source_url")
+
+  originalPosterUrl String? @map("original_poster_url")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([sourcePlatform, sourceId])
+  @@map("video_embeds")
+}
+
+model VideoThumbnail {
+  id      String @id @default(cuid())
+  videoId String @unique @map("video_id")
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  url   String
+  r2Key String @map("r2_key")
+
+  altText String? @map("alt_text")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("video_thumbnails")
+}
+
+model Model {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  imageUrl  String?  @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  videos    Video[]  @relation("VideoModels")
+
+  @@index([slug])
+  @@map("models")
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  videos    Video[]  @relation("VideoCategories")
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  videos    Video[]  @relation("VideoTags")
+
+  @@index([slug])
+  @@map("tags")
+}
+
+model DailyView {
+  id      String   @id @default(cuid())
+  videoId String   @map("video_id")
+  video   Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  date    DateTime @db.Date
+  count   Int      @default(0)
+
+  @@unique([videoId, date])
+  @@index([date(sort: Desc)])
+  @@map("daily_views")
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("admins")
+}
