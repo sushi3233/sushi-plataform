@@ -10,6 +10,7 @@ import {
     Tags,
     LogOut,
     Layers,
+    Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,7 @@ const navigation = [
     { name: 'Modelos', href: '/admin/modelos', icon: Users },
     { name: 'Categorias', href: '/admin/categorias', icon: FolderOpen },
     { name: 'Tags', href: '/admin/tags', icon: Tags },
+    { name: 'Configurações', href: '/admin/configuracoes', icon: Settings },
 ];
 
 export function AdminSidebar() {

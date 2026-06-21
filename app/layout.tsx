@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import { prisma } from "@/lib/db";
+import { DevToolsProtection } from "@/components/devtools-protection";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,11 +54,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const setting = await prisma.setting.findUnique({
+    where: { key: 'devtools_protection' },
+  }).catch(() => null);
+
+  const devtoolsEnabled = setting?.value === 'true';
+
   return (
     <html lang="pt-BR">
       <head>
@@ -74,6 +82,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <DevToolsProtection enabled={devtoolsEnabled} />
         {children}
       </body>
     </html>
