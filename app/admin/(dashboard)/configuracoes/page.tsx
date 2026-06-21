@@ -1,10 +1,10 @@
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
 import { SettingsForm } from './settings-form';
 
 export const metadata = { title: 'Configurações' };
 
 export default async function ConfiguracoesPage() {
-    const setting = await prisma.setting.findUnique({
+    const setting = await db.setting.findUnique({
         where: { key: 'devtools_protection' },
     }).catch(() => null);
 

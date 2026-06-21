@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
-import { prisma } from "@/lib/db";
+import { db } from "@/lib/db";
 import { DevToolsProtection } from "@/components/devtools-protection";
 
 const geistSans = Geist({
@@ -59,7 +59,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const setting = await prisma.setting.findUnique({
+  const setting = await db.setting.findUnique({
     where: { key: 'devtools_protection' },
   }).catch(() => null);
 
