@@ -53,7 +53,7 @@ export function isAuthenticated(request: Request): boolean {
 
     if (!adminSession) return false;
 
-    const sessionValue = adminSession.split('=')[1];
+    const sessionValue = adminSession.split('=').slice(1).join('=');
 
     const expectedSession = process.env.ADMIN_SECRET;
 
