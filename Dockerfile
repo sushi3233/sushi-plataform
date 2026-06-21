@@ -16,7 +16,8 @@ COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
 # Install dependencies with frozen lockfile
-RUN pnpm install --frozen-lockfile
+# NODE_ENV override ensures devDependencies (prisma CLI, typescript, etc.) are always installed
+RUN NODE_ENV=development pnpm install --frozen-lockfile
 
 # ========================================
 # Stage 2: Builder
