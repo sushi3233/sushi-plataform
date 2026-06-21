@@ -32,7 +32,7 @@ export function SettingsForm({ devtoolsEnabled }: { devtoolsEnabled: boolean }) 
     return (
         <div className="flex items-center justify-between py-4 border-t">
             <div>
-                <p className="font-medium">Proteção contra DevTools</p>
+                <p className="font-medium text-foreground">Proteção contra DevTools</p>
                 <p className="text-sm text-muted-foreground mt-1">
                     Quando ativado, o site fecha automaticamente ao detectar a abertura do DevTools do navegador.
                 </p>
