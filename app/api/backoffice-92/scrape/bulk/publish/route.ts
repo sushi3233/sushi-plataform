@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import slugify from 'slugify';
 import { db as prisma } from '@/lib/db';
@@ -239,7 +239,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        revalidatePath('/admin/videos');
+        revalidatePath('/backoffice-92/videos');
         revalidatePath('/');
 
         console.info(`[Bulk Publish] Completed. published=${published}, failed=${failed}`);

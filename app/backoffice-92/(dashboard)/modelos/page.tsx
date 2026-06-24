@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +26,7 @@ async function getModelsWithCount() {
 }
 
 function buildModelVideosHref(slug: string): string {
-    return `/admin/videos?model=${encodeURIComponent(slug)}`;
+    return `/backoffice-92/videos?model=${encodeURIComponent(slug)}`;
 }
 
 export default async function AdminModelsPage() {

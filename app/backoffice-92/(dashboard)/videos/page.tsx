@@ -1,11 +1,11 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Edit, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { getVideosPaginated } from '@/lib/services/videos';
 import { formatDuration } from '@/lib/utils';
-import { DeleteVideoButton } from '@/components/admin/delete-video-button';
+import { DeleteVideoButton } from '@/components/backoffice-92/delete-video-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +30,7 @@ function buildAdminVideosHref(page: number, perPage: number, modelSlug?: string)
     if (perPage !== 20) params.set('perPage', String(perPage));
     if (modelSlug) params.set('model', modelSlug);
     const query = params.toString();
-    return query ? `/admin/videos?${query}` : '/admin/videos';
+    return query ? `/backoffice-92/videos?${query}` : '/backoffice-92/videos';
 }
 
 export default async function AdminVideosPage({ searchParams }: AdminVideosPageProps) {
@@ -81,7 +81,7 @@ export default async function AdminVideosPage({ searchParams }: AdminVideosPageP
                     <h1 className="text-3xl font-bold text-foreground">Vídeos</h1>
                     <p className="text-muted-foreground">Gerencie todos os vídeos da plataforma</p>
                 </div>
-                <Link href="/admin/videos/novo-hls">
+                <Link href="/backoffice-92/videos/novo-hls">
                     <Button>
                         <Plus className="mr-2 h-4 w-4" />
                         Novo Vídeo
@@ -189,7 +189,7 @@ export default async function AdminVideosPage({ searchParams }: AdminVideosPageP
                                             </td>
                                             <td className="py-4">
                                                 <div className="flex justify-end space-x-2">
-                                                    <Link href={`/admin/videos/${video.id}/edit`}>
+                                                    <Link href={`/backoffice-92/videos/${video.id}/edit`}>
                                                         <Button variant="ghost" size="sm">
                                                             <Edit className="h-4 w-4" />
                                                         </Button>

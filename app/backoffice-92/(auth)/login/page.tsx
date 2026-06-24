@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
         setLoading(true);
 
         try {
-            const response = await fetch('/api/admin/login', {
+            const response = await fetch('/api/backoffice-92/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ export default function AdminLoginPage() {
             });
 
             if (response.ok) {
-                router.push('/admin');
+                router.push('/backoffice-92');
                 router.refresh();
             } else {
                 const data = await response.json();

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useMemo, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
@@ -160,7 +160,7 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
         try {
             const formData = new FormData();
             formData.append('thumbnail', file);
-            const response = await fetch('/api/admin/upload-thumbnail', {
+            const response = await fetch('/api/backoffice-92/upload-thumbnail', {
                 method: 'POST',
                 body: formData,
             });
@@ -475,7 +475,7 @@ export default function BulkImportPage() {
         if (ids.length === 0) return [];
         const params = new URLSearchParams();
         ids.forEach((id) => params.append('ids', id));
-        const response = await fetch(`/api/admin/videos?${params.toString()}`);
+        const response = await fetch(`/api/backoffice-92/videos?${params.toString()}`);
         if (!response.ok) return [];
         const data = (await response.json()) as AdminVideoResponse;
         return data.videos.map((video) => {
@@ -506,7 +506,7 @@ export default function BulkImportPage() {
         setDiscoveryError(null);
         setDiscoveredUrls([]);
         try {
-            const response = await fetch('/api/admin/scrape/discover', {
+            const response = await fetch('/api/backoffice-92/scrape/discover', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: modelUrl }),
@@ -535,7 +535,7 @@ export default function BulkImportPage() {
             const allResults: ScrapeResultItem[] = [];
             for (let i = 0; i < discoveredUrls.length; i += BATCH_SIZE) {
                 const batch = discoveredUrls.slice(i, i + BATCH_SIZE);
-                const response = await fetch('/api/admin/scrape/bulk', {
+                const response = await fetch('/api/backoffice-92/scrape/bulk', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ urls: batch }),
@@ -572,7 +572,7 @@ export default function BulkImportPage() {
         setPublishing(true);
         setPublishResult(null);
         try {
-            const response = await fetch('/api/admin/scrape/bulk/publish', {
+            const response = await fetch('/api/backoffice-92/scrape/bulk/publish', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -633,7 +633,7 @@ export default function BulkImportPage() {
         <div className="space-y-6">
 
             <div className="flex items-center space-x-4">
-                <Link href="/admin/videos">
+                <Link href="/backoffice-92/videos">
                     <Button variant="ghost" size="sm">
                         <ArrowLeft className="h-4 w-4" />
                     </Button>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -15,13 +15,13 @@ import {
 import { cn } from '@/lib/utils';
 
 const navigation = [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Vídeos', href: '/admin/videos', icon: Video },
-    { name: 'Importação em Massa', href: '/admin/videos/bulk-import', icon: Layers },
-    { name: 'Modelos', href: '/admin/modelos', icon: Users },
-    { name: 'Categorias', href: '/admin/categorias', icon: FolderOpen },
-    { name: 'Tags', href: '/admin/tags', icon: Tags },
-    { name: 'Configurações', href: '/admin/configuracoes', icon: Settings },
+    { name: 'Dashboard', href: '/backoffice-92', icon: LayoutDashboard },
+    { name: 'Vídeos', href: '/backoffice-92/videos', icon: Video },
+    { name: 'Importação em Massa', href: '/backoffice-92/videos/bulk-import', icon: Layers },
+    { name: 'Modelos', href: '/backoffice-92/modelos', icon: Users },
+    { name: 'Categorias', href: '/backoffice-92/categorias', icon: FolderOpen },
+    { name: 'Tags', href: '/backoffice-92/tags', icon: Tags },
+    { name: 'Configurações', href: '/backoffice-92/configuracoes', icon: Settings },
 ];
 
 export function AdminSidebar() {
@@ -61,7 +61,7 @@ export function AdminSidebar() {
             </nav>
 
             <div className="border-t border-sidebar-border p-4">
-                <form action="/api/admin/logout" method="POST">
+                <form action="/api/backoffice-92/logout" method="POST">
                     <button
                         type="submit"
                         className="group flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"

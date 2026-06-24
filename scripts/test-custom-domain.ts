@@ -1,4 +1,4 @@
-
+﻿
 
 import 'dotenv/config';
 
@@ -52,7 +52,7 @@ async function testCustomDomain() {
     console.log('='.repeat(80));
     console.log('\nSe as imagens carregaram com sucesso (200 OK):');
     console.log('1. Reinicie o servidor de desenvolvimento: npm run dev');
-    console.log('2. Acesse: https://clubdaputaria.com/admin/videos/novo-hls');
+    console.log('2. Acesse: https://clubdaputaria.com/backoffice-92/videos/novo-hls');
     console.log('3. Faça upload de uma nova thumbnail');
     console.log('4. O preview deve funcionar agora! \n');
     console.log('\nSe ainda houver erros:');

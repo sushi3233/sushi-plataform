@@ -1,4 +1,4 @@
-import type { MetadataRoute } from 'next';
+﻿import type { MetadataRoute } from 'next';
 
 const SITE_URL = 'https://www.clubdaputaria.com';
 
@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
 
         allow: ['/', '/api/thumb/'],
-        disallow: ['/admin/', '/api/', '/busca', '/embed/'],
+        disallow: ['/backoffice-92/', '/api/', '/busca', '/embed/'],
       },
 
       { userAgent: 'GPTBot', disallow: '/' },

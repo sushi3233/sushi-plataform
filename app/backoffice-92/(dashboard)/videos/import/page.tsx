@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -24,7 +24,7 @@ export default function ImportVideoPage() {
         setResult(null);
 
         try {
-            const response = await fetch('/api/admin/scrape', {
+            const response = await fetch('/api/backoffice-92/scrape', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url }),
@@ -41,7 +41,7 @@ export default function ImportVideoPage() {
                 setUrl('');
 
                 setTimeout(() => {
-                    router.push(`/admin/videos`);
+                    router.push(`/backoffice-92/videos`);
                 }, 2000);
             } else {
                 setResult({
@@ -63,7 +63,7 @@ export default function ImportVideoPage() {
         <div className="space-y-6">
 
             <div className="flex items-center space-x-4">
-                <Link href="/admin/videos">
+                <Link href="/backoffice-92/videos">
                     <Button variant="ghost" size="sm">
                         <ArrowLeft className="h-4 w-4" />
                     </Button>

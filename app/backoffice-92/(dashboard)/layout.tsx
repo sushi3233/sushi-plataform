@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+﻿import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
 import { AdminHeader } from '@/components/admin/admin-header';
@@ -14,7 +14,7 @@ export default async function AdminLayout({
     const adminSecret = process.env.ADMIN_SECRET;
 
     if (!adminSession || !adminSecret || adminSession.value !== adminSecret) {
-        redirect('/admin/login');
+        redirect('/backoffice-92/login');
     }
 
     return (

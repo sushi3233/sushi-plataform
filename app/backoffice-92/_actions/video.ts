@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 
 import { db } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
@@ -96,14 +96,14 @@ export async function createHLSVideo(prevState: CreateHLSVideoState, formData: F
             });
         });
 
-        revalidatePath('/admin/videos');
+        revalidatePath('/backoffice-92/videos');
         revalidatePath('/');
     } catch (error: any) {
         console.error('[Action] Erro ao criar vídeo:', error);
         return { error: error.message || 'Erro interno ao criar vídeo' };
     }
 
-    redirect('/admin/videos');
+    redirect('/backoffice-92/videos');
 }
 
 export async function updateHLSVideo(prevState: CreateHLSVideoState, formData: FormData): Promise<CreateHLSVideoState> {
@@ -207,7 +207,7 @@ export async function updateHLSVideo(prevState: CreateHLSVideoState, formData: F
             }
         });
 
-        revalidatePath('/admin/videos');
+        revalidatePath('/backoffice-92/videos');
         revalidatePath('/');
         revalidatePath(`/video/${existingVideo.slug}`);
     } catch (error: any) {
@@ -215,7 +215,7 @@ export async function updateHLSVideo(prevState: CreateHLSVideoState, formData: F
         return { error: error.message || 'Erro interno ao atualizar vídeo' };
     }
 
-    redirect('/admin/videos');
+    redirect('/backoffice-92/videos');
 }
 
 export async function deleteVideo(videoId: string): Promise<{ error?: string; success?: boolean }> {
@@ -243,7 +243,7 @@ export async function deleteVideo(videoId: string): Promise<{ error?: string; su
             where: { id: videoId },
         });
 
-        revalidatePath('/admin/videos');
+        revalidatePath('/backoffice-92/videos');
         revalidatePath('/');
 
         return { success: true };

@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Trash2, Loader2 } from 'lucide-react';
-import { deleteVideo } from '@/app/admin/_actions/video';
+import { deleteVideo } from '@/app/backoffice-92/_actions/video';
 
 interface DeleteVideoButtonProps {
     videoId: string;

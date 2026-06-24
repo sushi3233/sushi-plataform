@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(git add -A)",
+      "PowerShell(git commit -m \"feat: rename admin route to /backoffice-92 for security through obscurity\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Micro\\Downloads\\Club-da-Put--main\\Club-da-Put--main\\app\\admin"
+    ]
+  }
+}

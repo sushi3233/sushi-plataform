@@ -1,4 +1,4 @@
-import { db as prisma } from '../lib/db';
+﻿import { db as prisma } from '../lib/db';
 
 async function checkVideos() {
     console.log(' Verificando vídeos no banco...\n');
@@ -25,7 +25,7 @@ async function checkVideos() {
 
         if (videos.length === 0) {
             console.log(' Nenhum vídeo encontrado no banco!');
-            console.log(' Faça upload de um vídeo pelo painel admin: http://localhost:3000/admin/videos/novo-hls');
+            console.log(' Faça upload de um vídeo pelo painel admin: http://localhost:3000/backoffice-92/videos/novo-hls');
         } else {
             console.log(' Vídeos encontrados:\n');
             videos.forEach((video, index) => {

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 
@@ -11,7 +11,7 @@ export function SettingsForm({ devtoolsEnabled }: { devtoolsEnabled: boolean }) 
         setLoading(true);
         setMessage('');
         try {
-            const res = await fetch('/api/admin/settings', {
+            const res = await fetch('/api/backoffice-92/settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key: 'devtools_protection', value: String(!enabled) }),
