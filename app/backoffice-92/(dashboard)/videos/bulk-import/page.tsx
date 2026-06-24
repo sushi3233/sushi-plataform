@@ -457,7 +457,10 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
 
 export default function BulkImportPage() {
     const [step, setStep] = useState<Step>('discovery');
+    const [discoveryMode, setDiscoveryMode] = useState<'url' | 'html'>('url');
     const [modelUrl, setModelUrl] = useState('');
+    const [pastedHtml, setPastedHtml] = useState('');
+    const [htmlBaseUrl, setHtmlBaseUrl] = useState('');
     const [discovering, setDiscovering] = useState(false);
     const [discoveryError, setDiscoveryError] = useState<string | null>(null);
     const [discoveredUrls, setDiscoveredUrls] = useState<string[]>([]);
@@ -506,10 +509,13 @@ export default function BulkImportPage() {
         setDiscoveryError(null);
         setDiscoveredUrls([]);
         try {
+            const payload = discoveryMode === 'html'
+                ? { html: pastedHtml, baseUrl: htmlBaseUrl }
+                : { url: modelUrl };
             const response = await fetch('/api/backoffice-92/scrape/discover', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: modelUrl }),
+                body: JSON.stringify(payload),
             });
             const data = (await response.json()) as { videoUrls?: string[]; error?: string };
             if (!response.ok) {
@@ -652,25 +658,85 @@ export default function BulkImportPage() {
             {step === 'discovery' && (
                 <Card>
                     <CardHeader>
-                        <CardTitle>1. Discovery — URL da Página da Modelo</CardTitle>
+                        <CardTitle>1. Discovery — Vídeos da Página da Modelo</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <form onSubmit={handleDiscover} className="flex gap-3">
-                            <Input
-                                value={modelUrl}
-                                onChange={(e) => setModelUrl(e.target.value)}
-                                placeholder="https://www.xvideosbuceta.com/actor/elisa-sanches/ (qualquer site)"
-                                required
-                            />
-                            <Button type="submit" disabled={discovering || !modelUrl}>
-                                {discovering ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                    <Search className="mr-2 h-4 w-4" />
-                                )}
-                                Descobrir
-                            </Button>
+                        <div className="flex gap-1 rounded-lg bg-gray-100 p-1 w-fit">
+                            <button
+                                type="button"
+                                onClick={() => { setDiscoveryMode('url'); setDiscoveryError(null); }}
+                                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${discoveryMode === 'url' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'}`}
+                            >
+                                Via URL
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { setDiscoveryMode('html'); setDiscoveryError(null); }}
+                                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${discoveryMode === 'html' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'}`}
+                            >
+                                Colar HTML
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleDiscover} className="space-y-3">
+                            {discoveryMode === 'url' ? (
+                                <div className="flex gap-3">
+                                    <Input
+                                        value={modelUrl}
+                                        onChange={(e) => setModelUrl(e.target.value)}
+                                        placeholder="https://site.com/actor/nome-da-modelo/"
+                                        required
+                                    />
+                                    <Button type="submit" disabled={discovering || !modelUrl}>
+                                        {discovering ? (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Search className="mr-2 h-4 w-4" />
+                                        )}
+                                        Descobrir
+                                    </Button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium text-gray-700">
+                                            URL da página (para resolver links relativos)
+                                        </label>
+                                        <Input
+                                            value={htmlBaseUrl}
+                                            onChange={(e) => setHtmlBaseUrl(e.target.value)}
+                                            placeholder="https://xvideosputaria.com/modelo/pamela-alves-hd/"
+                                            required={discoveryMode === 'html'}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium text-gray-700">
+                                            HTML da página
+                                            <span className="ml-2 text-xs font-normal text-gray-500">
+                                                (Ctrl+U no browser → Ctrl+A → Ctrl+C → cole aqui)
+                                            </span>
+                                        </label>
+                                        <textarea
+                                            value={pastedHtml}
+                                            onChange={(e) => setPastedHtml(e.target.value)}
+                                            placeholder="Cole o HTML completo da página aqui..."
+                                            required={discoveryMode === 'html'}
+                                            rows={8}
+                                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs font-mono text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+                                        />
+                                    </div>
+                                    <Button type="submit" disabled={discovering || !pastedHtml || !htmlBaseUrl}>
+                                        {discovering ? (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Search className="mr-2 h-4 w-4" />
+                                        )}
+                                        Extrair URLs do HTML
+                                    </Button>
+                                </>
+                            )}
                         </form>
+
                         {discoveryError && <p className="text-sm text-red-600">{discoveryError}</p>}
                         {discoveredUrls.length > 0 && (
                             <div className="space-y-3">

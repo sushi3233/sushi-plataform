@@ -83,6 +83,14 @@ function extractVideoUrls($: cheerio.CheerioAPI, baseOrigin: string): string[] {
     return Array.from(found);
 }
 
+export function parseModelPageHtml(html: string, baseUrl: string): ModelPageResult {
+    const parsed = new URL(baseUrl);
+    const baseOrigin = `${parsed.protocol}//${parsed.hostname}`;
+    const $ = cheerio.load(html);
+    const videoUrls = extractVideoUrls($, baseOrigin);
+    return { videoUrls, totalFound: videoUrls.length };
+}
+
 export async function scrapeModelPage(url: string): Promise<ModelPageResult> {
     const parsed = new URL(url);
     const baseOrigin = `${parsed.protocol}//${parsed.hostname}`;

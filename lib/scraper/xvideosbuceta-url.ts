@@ -20,9 +20,10 @@ function normalizeUrl(parsed: URL): string {
 }
 
 const NON_VIDEO_PREFIXES = [
-    '/actor/', '/actors/', '/category/', '/categories/',
-    '/tag/', '/tags/', '/search/', '/page/', '/wp-', '/feed',
-    '/login', '/register', '/account', '/profile',
+    '/actor/', '/actors/', '/modelo/', '/modelos/', '/pornstar/', '/pornstars/',
+    '/category/', '/categories/', '/categoria/', '/categorias/',
+    '/tag/', '/tags/', '/search/', '/busca/', '/page/', '/pagina/',
+    '/wp-', '/feed', '/login', '/register', '/account', '/profile',
 ];
 
 export function validateModelPageUrl(rawUrl: string): UrlValidationResult {

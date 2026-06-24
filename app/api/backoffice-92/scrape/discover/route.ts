@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { assertAdminApiAuth } from '@/lib/admin-api-auth';
-import { scrapeModelPage } from '@/lib/scraper/xvideosbuceta-model-scraper';
+import { scrapeModelPage, parseModelPageHtml } from '@/lib/scraper/xvideosbuceta-model-scraper';
 import { validateModelPageUrl } from '@/lib/scraper/xvideosbuceta-url';
 
 function getErrorMessage(error: unknown): string {
@@ -12,7 +12,37 @@ export async function POST(request: NextRequest) {
     if (unauthorized) return unauthorized;
 
     try {
-        const body = (await request.json()) as { url?: unknown };
+        const body = (await request.json()) as { url?: unknown; html?: unknown; baseUrl?: unknown };
+
+        // HTML paste mode: parse provided HTML directly, no external fetch needed
+        if (typeof body.html === 'string' && body.html.trim()) {
+            const rawBaseUrl = typeof body.baseUrl === 'string' ? body.baseUrl.trim() : '';
+            if (!rawBaseUrl) {
+                return NextResponse.json({ error: 'baseUrl é obrigatória no modo HTML' }, { status: 400 });
+            }
+
+            let result;
+            try {
+                result = parseModelPageHtml(body.html, rawBaseUrl);
+            } catch {
+                return NextResponse.json({ error: 'baseUrl inválida' }, { status: 400 });
+            }
+
+            if (result.totalFound === 0) {
+                return NextResponse.json(
+                    { error: 'Nenhum video encontrado no HTML fornecido.' },
+                    { status: 404 }
+                );
+            }
+
+            return NextResponse.json({
+                success: true,
+                videoUrls: result.videoUrls,
+                totalFound: result.totalFound,
+            });
+        }
+
+        // URL fetch mode
         const rawUrl = typeof body.url === 'string' ? body.url : '';
 
         if (!rawUrl) {
