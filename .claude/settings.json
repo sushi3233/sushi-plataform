@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "PowerShell(git add -A)",
-      "PowerShell(git commit -m \"feat: rename admin route to /backoffice-92 for security through obscurity\")"
+      "PowerShell(git commit -m \"feat: rename admin route to /backoffice-92 for security through obscurity\")",
+      "PowerShell(git add app/backoffice-92/`\\(dashboard`\\)/videos/page.tsx)",
+      "PowerShell(git commit -m \"fix: restore correct import path for DeleteVideoButton component\")",
+      "PowerShell(git add lib/scraper/xvideosbuceta-model-scraper.ts lib/scraper/xvideosbuceta-scraper.ts)",
+      "PowerShell(git commit -m \"fix: add full browser headers to scrapers to bypass 403 blocks\")",
+      "PowerShell(git add lib/scraper/xvideosbuceta-url.ts lib/scraper/xvideosbuceta-model-scraper.ts app/backoffice-92/`\\(dashboard`\\)/videos/bulk-import/page.tsx app/backoffice-92/`\\(dashboard`\\)/videos/import/page.tsx)",
+      "PowerShell(git commit -m \"feat: remove domain restriction from scraper, support any site with vazounudes embeds\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\Micro\\Downloads\\Club-da-Put--main\\Club-da-Put--main\\app\\admin"
