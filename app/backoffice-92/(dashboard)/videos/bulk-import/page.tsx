@@ -659,7 +659,7 @@ export default function BulkImportPage() {
                             <Input
                                 value={modelUrl}
                                 onChange={(e) => setModelUrl(e.target.value)}
-                                placeholder="https://www.xvideosbuceta.com/actor/elisa-sanches/"
+                                placeholder="https://www.xvideosbuceta.com/actor/elisa-sanches/ (qualquer site)"
                                 required
                             />
                             <Button type="submit" disabled={discovering || !modelUrl}>

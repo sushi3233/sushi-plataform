@@ -71,7 +71,7 @@ export default function ImportVideoPage() {
                 <div>
                     <h1 className="text-3xl font-bold text-foreground">Importar Vídeo</h1>
                     <p className="text-muted-foreground">
-                        Cole a URL do xvideosbuceta.com para importar automaticamente
+                        Cole a URL de qualquer site compatível para importar automaticamente
                     </p>
                 </div>
             </div>
@@ -84,12 +84,12 @@ export default function ImportVideoPage() {
                     <form onSubmit={handleImport} className="space-y-4">
                         <div className="space-y-2">
                             <label htmlFor="url" className="text-sm font-medium text-foreground">
-                                URL do xvideosbuceta.com
+                                URL do vídeo
                             </label>
                             <Input
                                 id="url"
                                 type="url"
-                                placeholder="https://xvideosbuceta.com/video/..."
+                                placeholder="https://site.com/video/..."
                                 value={url}
                                 onChange={(e) => setUrl(e.target.value)}
                                 required
@@ -146,7 +146,7 @@ export default function ImportVideoPage() {
                     <CardTitle>Como funciona?</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm text-muted-foreground">
-                    <p>1. Cole a URL completa do vídeo no xvideosbuceta.com</p>
+                    <p>1. Cole a URL completa do vídeo (qualquer site que embuta vazounudes.net)</p>
                     <p>2. O sistema fará scraping automático de todos os metadados</p>
                     <p>3. A thumbnail de capa será processada e enviada para o R2 com SEO otimizado</p>
                     <p>4. O vídeo será salvo como <strong>RASCUNHO</strong> por segurança</p>
