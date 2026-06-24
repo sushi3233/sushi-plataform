@@ -5,7 +5,7 @@ import { Plus, Edit, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { getVideosPaginated } from '@/lib/services/videos';
 import { formatDuration } from '@/lib/utils';
-import { DeleteVideoButton } from '@/components/backoffice-92/delete-video-button';
+import { DeleteVideoButton } from '@/components/admin/delete-video-button';
 
 export const dynamic = 'force-dynamic';
 
