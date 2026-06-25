@@ -2,7 +2,7 @@
 
 import 'dotenv/config';
 
-const CUSTOM_DOMAIN = 'https://thumbs.clubdaputaria.com';
+const CUSTOM_DOMAIN = 'https://thumbs.xvideosprime.com';
 
 const THUMBNAIL_KEYS = [
     'thumbnails/1771342644909-k691v5ot.png',
@@ -52,12 +52,12 @@ async function testCustomDomain() {
     console.log('='.repeat(80));
     console.log('\nSe as imagens carregaram com sucesso (200 OK):');
     console.log('1. Reinicie o servidor de desenvolvimento: npm run dev');
-    console.log('2. Acesse: https://clubdaputaria.com/backoffice-92/videos/novo-hls');
+    console.log('2. Acesse: https://xvideosprime.com/backoffice-92/videos/novo-hls');
     console.log('3. Faça upload de uma nova thumbnail');
     console.log('4. O preview deve funcionar agora! \n');
     console.log('\nSe ainda houver erros:');
     console.log('1. Verifique se o DNS do custom domain está propagado');
-    console.log('2. Execute: nslookup thumbs.clubdaputaria.com');
+    console.log('2. Execute: nslookup thumbs.xvideosprime.com');
     console.log('3. Aguarde alguns minutos para propagação DNS\n');
 }
 

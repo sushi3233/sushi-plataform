@@ -1,4 +1,4 @@
-# Handoff — Club da Putaria
+﻿# Handoff — Xvideos Prime
 
 Documento de transferência do projeto. Descreve o que existe, como o sistema se organiza e quais peças precisam existir para a aplicação funcionar. Não cobre infraestrutura, provedores ou procedimentos operacionais.
 

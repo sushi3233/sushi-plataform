@@ -1,4 +1,4 @@
-import { VideoPlayer } from '@/components/video/video-player';
+﻿import { VideoPlayer } from '@/components/video/video-player';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getVideoBySlug } from '@/lib/services/videos';
@@ -6,7 +6,7 @@ import { getThumbnailUrl } from '@/lib/utils';
 
 export const revalidate = 3600;
 
-const SITE_URL = 'https://www.clubdaputaria.com';
+const SITE_URL = 'https://www.xvideosprime.com';
 
 interface EmbedPageProps {
   params: Promise<{
@@ -49,7 +49,7 @@ export async function generateMetadata({
       description: video.metaDescription,
       type: 'video.other',
       url: `${SITE_URL}/${videoSlug}`,
-      siteName: 'Club da Putaria',
+      siteName: 'Xvideos Prime',
       locale: 'pt_BR',
       images: coverThumbnail
         ? [{ url: coverThumbnail, width: 1280, height: 720, alt: video.metaTitle }]
@@ -97,7 +97,7 @@ export default async function EmbedPage({ params }: EmbedPageProps) {
           rel="noopener noreferrer"
           className="text-blue-400 hover:text-blue-300 transition-colors"
         >
-          Ver no Club da Putaria →
+          Ver no Xvideos Prime →
         </a>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+﻿import { PrismaClient } from '@prisma/client';
 import slugify from 'slugify';
 
 const prisma = new PrismaClient();
@@ -207,9 +207,9 @@ async function main() {
         console.log('========================================\n');
 
         console.log(' URLs dos vídeos:');
-        console.log(`1. https://clubdaputaria.com/${video1.slug}/`);
-        console.log(`2. https://clubdaputaria.com/${video2.slug}/`);
-        console.log(`3. https://clubdaputaria.com/${video3.slug}/\n`);
+        console.log(`1. https://xvideosprime.com/${video1.slug}/`);
+        console.log(`2. https://xvideosprime.com/${video2.slug}/`);
+        console.log(`3. https://xvideosprime.com/${video3.slug}/\n`);
 
         console.log('  ATENÇÃO: Thumbnails precisam ser adicionadas!');
         console.log('Acesse o admin e faça upload das thumbnails para cada vídeo.\n');

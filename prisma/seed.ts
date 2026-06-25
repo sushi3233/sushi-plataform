@@ -1,4 +1,4 @@
-import 'dotenv/config';
+﻿import 'dotenv/config';
 import { PrismaClient, VideoStatus } from '@prisma/client';
 import slugify from 'slugify';
 
@@ -177,7 +177,7 @@ async function main() {
 
   await prisma.admin.create({
     data: {
-      email: 'admin@clubdaputaria.com',
+      email: 'admin@xvideosprime.com',
       passwordHash: '$2b$10$placeholder-hash-for-testing',
       name: 'Administrador',
     },

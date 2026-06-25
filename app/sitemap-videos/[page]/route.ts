@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-const BASE_URL = 'https://www.clubdaputaria.com';
+const BASE_URL = 'https://www.xvideosprime.com';
 const PAGE_SIZE = 1000;
 
 export async function GET(
@@ -90,7 +90,7 @@ export async function GET(
                     }
       <video:family_friendly>no</video:family_friendly>
       <video:requires_subscription>no</video:requires_subscription>
-      <video:uploader info="${BASE_URL}">Club da Putaria</video:uploader>
+      <video:uploader info="${BASE_URL}">Xvideos Prime</video:uploader>
       <video:live>no</video:live>
       <video:view_count>${video.views}</video:view_count>
 ${tags}

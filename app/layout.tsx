@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Club da Putaria - Vídeos Pornô Grátis em HD',
-    template: '%s | Club da Putaria',
+    default: 'Xvideos Prime - Vídeos Pornô Grátis em HD',
+    template: '%s | Xvideos Prime',
   },
   description: 'Os melhores vídeos pornô grátis em HD. Assista milhares de vídeos adultos brasileiros com novinhas, amadores e muito mais.',
   keywords: ['pornô', 'vídeos adultos', 'sexo', 'brasileiro', 'grátis', 'hd', 'amador', 'novinha', 'vazado'],
@@ -33,20 +33,20 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  metadataBase: new URL('https://www.clubdaputaria.com'),
+  metadataBase: new URL('https://www.xvideosprime.com'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    siteName: 'Club da Putaria',
-    title: 'Club da Putaria - Vídeos Pornô Grátis em HD',
+    siteName: 'Xvideos Prime',
+    title: 'Xvideos Prime - Vídeos Pornô Grátis em HD',
     description: 'Os melhores vídeos pornô grátis em HD. Assista milhares de vídeos adultos brasileiros.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Club da Putaria - Vídeos Pornô Grátis em HD',
+    title: 'Xvideos Prime - Vídeos Pornô Grátis em HD',
     description: 'Os melhores vídeos pornô grátis em HD. Assista milhares de vídeos adultos brasileiros.',
   },
   verification: {

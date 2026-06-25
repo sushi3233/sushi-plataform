@@ -66,7 +66,7 @@ export default function AdminLoginPage() {
                 </div>
 
                 <div className="text-slate-500 text-sm">
-                    © 2025 Club da Putaria. Todos os direitos reservados.
+                    © 2025 Xvideos Prime. Todos os direitos reservados.
                 </div>
             </div>
 
@@ -95,7 +95,7 @@ export default function AdminLoginPage() {
                                 <input
                                     id="email"
                                     type="email"
-                                    placeholder="admin@clubdaputaria.com"
+                                    placeholder="admin@xvideosprime.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required

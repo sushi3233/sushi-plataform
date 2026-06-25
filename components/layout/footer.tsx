@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 
 export function Footer() {
@@ -108,7 +108,7 @@ export function Footer() {
 
         <div className="space-y-4 text-center text-sm text-muted-foreground">
           <p>
-            © {currentYear} Club da Putaria. Todos os direitos reservados.
+            © {currentYear} Xvideos Prime. Todos os direitos reservados.
           </p>
           <p className="text-xs">
             <strong>Aviso Legal:</strong> Este site contém conteúdo adulto e é

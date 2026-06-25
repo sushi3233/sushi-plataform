@@ -1,4 +1,4 @@
-import { VideoGrid } from '@/components/video/video-grid';
+﻿import { VideoGrid } from '@/components/video/video-grid';
 import { Pagination } from '@/components/layout/pagination';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -35,12 +35,12 @@ export async function generateMetadata({
         title: `${tag.name} - Vídeos Pornô`,
         description: `Vídeos pornô com a tag ${tag.name}. Assista grátis em HD os melhores vídeos adultos.`,
         alternates: {
-            canonical: `https://www.clubdaputaria.com/xxx/${slug}`,
+            canonical: `https://www.xvideosprime.com/xxx/${slug}`,
         },
         openGraph: {
-            title: `${tag.name} — Vídeos Pornô | Club da Putaria`,
+            title: `${tag.name} — Vídeos Pornô | Xvideos Prime`,
             description: `Vídeos pornô com a tag ${tag.name}. Assista grátis em HD os melhores vídeos adultos.`,
-            url: `https://www.clubdaputaria.com/xxx/${slug}`,
+            url: `https://www.xvideosprime.com/xxx/${slug}`,
             type: 'website',
             locale: 'pt_BR',
         },

@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-const BASE_URL = 'https://www.clubdaputaria.com';
+const BASE_URL = 'https://www.xvideosprime.com';
 const VIDEOS_PER_SITEMAP = 1000;
 
 export async function GET() {

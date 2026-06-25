@@ -1,4 +1,4 @@
-import { VideoGrid } from '@/components/video/video-grid';
+﻿import { VideoGrid } from '@/components/video/video-grid';
 import { Pagination } from '@/components/layout/pagination';
 import { JsonLd } from '@/components/seo/json-ld';
 import { getMostViewedVideosPaginated } from '@/lib/services/videos';
@@ -7,7 +7,7 @@ import { getThumbnailUrl } from '@/lib/utils';
 
 export const revalidate = 600;
 
-const SITE_URL = 'https://www.clubdaputaria.com';
+const SITE_URL = 'https://www.xvideosprime.com';
 const ITEMS_PER_PAGE = 20;
 
 export default async function HomePage() {
@@ -41,7 +41,7 @@ export default async function HomePage() {
         type="WebSite"
         data={{
           '@id': `${SITE_URL}/#website`,
-          name: 'Club da Putaria',
+          name: 'Xvideos Prime',
           url: SITE_URL,
           description: 'Os melhores vídeos pornô grátis em HD. Assista milhares de vídeos adultos brasileiros.',
           inLanguage: 'pt-BR',
@@ -55,7 +55,7 @@ export default async function HomePage() {
           },
           publisher: {
             '@type': 'Organization',
-            name: 'Club da Putaria',
+            name: 'Xvideos Prime',
             url: SITE_URL,
           },
         }}

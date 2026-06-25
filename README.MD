@@ -1,4 +1,4 @@
-# Club da Putaria
+﻿# Xvideos Prime
 
 Plataforma web de vídeos com catálogo público, descoberta de conteúdo e painel administrativo.
 

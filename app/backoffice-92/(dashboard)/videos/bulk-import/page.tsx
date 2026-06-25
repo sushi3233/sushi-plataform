@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useCallback, useMemo, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
@@ -12,6 +12,7 @@ import {
     CheckCircle,
     ChevronRight,
     Clock,
+    FileJson,
     ImageOff,
     Loader2,
     PlayCircle,
@@ -22,7 +23,8 @@ import {
     X,
 } from 'lucide-react';
 
-type Step = 'discovery' | 'scraping' | 'review';
+type Step = 'discovery' | 'scraping' | 'importing' | 'review';
+type InputMode = 'url' | 'json';
 
 interface ScrapeResultItem {
     url: string;
@@ -104,7 +106,7 @@ function normalizeSlugInput(input: string): string {
     return input
         .toLowerCase()
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[̀-ͯ]/g, '')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/-{2,}/g, '-')
         .replace(/(^-|-$)/g, '');
@@ -457,16 +459,27 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
 
 export default function BulkImportPage() {
     const [step, setStep] = useState<Step>('discovery');
+    const [inputMode, setInputMode] = useState<InputMode>('url');
+
+    // ── URL mode state ────────────────────────────────────────────────────────
     const [modelUrl, setModelUrl] = useState('');
     const [discovering, setDiscovering] = useState(false);
     const [discoveryError, setDiscoveryError] = useState<string | null>(null);
     const [discoveredUrls, setDiscoveredUrls] = useState<string[]>([]);
-
     const [scraping, setScraping] = useState(false);
     const [scrapeProgress, setScrapeProgress] = useState(0);
     const [scrapeResults, setScrapeResults] = useState<ScrapeResultItem[]>([]);
     const [scrapeErrors, setScrapeErrors] = useState<ScrapeResultItem[]>([]);
 
+    // ── JSON mode state ───────────────────────────────────────────────────────
+    const [jsonText, setJsonText] = useState('');
+    const [jsonError, setJsonError] = useState<string | null>(null);
+    const jsonFileInputRef = useRef<HTMLInputElement>(null);
+    const [importProgress, setImportProgress] = useState(0);
+    const [importTotal, setImportTotal] = useState(0);
+    const [importErrors, setImportErrors] = useState<ScrapeResultItem[]>([]);
+
+    // ── Shared state ──────────────────────────────────────────────────────────
     const [videos, setVideos] = useState<ImportedVideo[]>([]);
     const [publishing, setPublishing] = useState(false);
     const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
@@ -500,6 +513,7 @@ export default function BulkImportPage() {
         });
     }, []);
 
+    // ── URL mode handlers ─────────────────────────────────────────────────────
     const handleDiscover = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setDiscovering(true);
@@ -562,6 +576,87 @@ export default function BulkImportPage() {
         }
     };
 
+    // ── JSON mode handlers ────────────────────────────────────────────────────
+    const handleJsonFileLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            setJsonText((ev.target?.result as string) || '');
+            setJsonError(null);
+        };
+        reader.readAsText(file, 'utf-8');
+        if (jsonFileInputRef.current) jsonFileInputRef.current.value = '';
+    };
+
+    const parseJsonVideos = (): unknown[] | null => {
+        try {
+            const parsed = JSON.parse(jsonText) as unknown;
+            if (Array.isArray(parsed)) return parsed;
+            if (typeof parsed === 'object' && parsed !== null) {
+                const vids = (parsed as Record<string, unknown>).videos;
+                if (Array.isArray(vids)) return vids;
+            }
+            setJsonError('JSON inválido: esperado um array de vídeos ou { videos: [...] }');
+            return null;
+        } catch {
+            setJsonError('JSON inválido: verifique a formatação');
+            return null;
+        }
+    };
+
+    const handleImportJson = async () => {
+        setJsonError(null);
+        const rawVideos = parseJsonVideos();
+        if (!rawVideos) return;
+        if (rawVideos.length === 0) {
+            setJsonError('Nenhum vídeo encontrado no JSON');
+            return;
+        }
+
+        setStep('importing');
+        setImportTotal(rawVideos.length);
+        setImportProgress(0);
+        setImportErrors([]);
+
+        const allResults: ScrapeResultItem[] = [];
+
+        for (let i = 0; i < rawVideos.length; i += BATCH_SIZE) {
+            const batch = rawVideos.slice(i, i + BATCH_SIZE);
+            try {
+                const response = await fetch('/api/backoffice-92/scrape/import-json', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ videos: batch }),
+                });
+                const data = (await response.json()) as { results?: ScrapeResultItem[]; error?: string };
+                const batchResults = response.ok && Array.isArray(data.results)
+                    ? data.results
+                    : batch.map((_, j) => ({
+                        url: (batch[j] as Record<string, string>)?.url || '',
+                        success: false,
+                        error: data.error || 'Erro no lote',
+                    }));
+                allResults.push(...batchResults);
+            } catch (err) {
+                allResults.push(...batch.map((_, j) => ({
+                    url: (batch[j] as Record<string, string>)?.url || '',
+                    success: false,
+                    error: getErrorMessage(err),
+                })));
+            }
+            setImportProgress(Math.min(allResults.length, rawVideos.length));
+        }
+
+        setImportErrors(allResults.filter((r) => !r.success));
+        const createdIds = allResults
+            .filter((r) => r.success && r.videoId)
+            .map((r) => r.videoId as string);
+        setVideos(await fetchDraftVideos(createdIds));
+        setStep('review');
+    };
+
+    // ── Shared handlers ───────────────────────────────────────────────────────
     const updateVideo = (id: string, field: keyof ImportedVideo, value: string | boolean | number | null) => {
         setVideos((prev) => prev.map((video) => (video.id === id ? { ...video, [field]: value } : video)));
     };
@@ -616,14 +711,21 @@ export default function BulkImportPage() {
         }
     };
 
+    // ── Derived state ─────────────────────────────────────────────────────────
     const selectedCount = videos.filter((v) => v.selected).length;
     const blockedSelected = videos.filter((v) => v.selected && v.missingThumbnail).length;
-    const progressPct = discoveredUrls.length
+    const urlProgressPct = discoveredUrls.length
         ? Math.round((scrapeProgress / discoveredUrls.length) * 100)
         : 0;
-    const successCount = scrapeResults.filter((r) => r.success).length;
-    const missingThumbCount = scrapeResults.filter((r) => r.success && r.missingThumbnail).length;
+    const jsonProgressPct = importTotal
+        ? Math.round((importProgress / importTotal) * 100)
+        : 0;
+    const scrapeSuccessCount = scrapeResults.filter((r) => r.success).length;
+    const scrapeThumbMissing = scrapeResults.filter((r) => r.success && r.missingThumbnail).length;
+    const importSuccessCount = importTotal - importErrors.length;
     const allSelected = videos.length > 0 && selectedCount === videos.length;
+    const activeErrors = inputMode === 'url' ? scrapeErrors : importErrors;
+
     const statusHint = useMemo(
         () => (blockedSelected > 0 ? `${blockedSelected} selecionado(s) serão bloqueados por falta de thumbnail.` : null),
         [blockedSelected]
@@ -649,76 +751,197 @@ export default function BulkImportPage() {
                 )}
             </div>
 
+            {/* ── Step 1: Discovery / JSON paste ─────────────────────────── */}
             {step === 'discovery' && (
                 <Card>
                     <CardHeader>
-                        <CardTitle>1. Discovery — URL da Página da Modelo</CardTitle>
+                        {/* Tabs */}
+                        <div className="flex gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1 w-fit">
+                            <button
+                                type="button"
+                                onClick={() => { setInputMode('url'); setDiscoveryError(null); }}
+                                className={`flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+                                    inputMode === 'url'
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                            >
+                                <Search className="h-3.5 w-3.5" />
+                                URL da Modelo
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { setInputMode('json'); setJsonError(null); }}
+                                className={`flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+                                    inputMode === 'json'
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                            >
+                                <FileJson className="h-3.5 w-3.5" />
+                                JSON do Scraper Local
+                            </button>
+                        </div>
                     </CardHeader>
+
                     <CardContent className="space-y-4">
-                        <form onSubmit={handleDiscover} className="flex gap-3">
-                            <Input
-                                value={modelUrl}
-                                onChange={(e) => setModelUrl(e.target.value)}
-                                placeholder="https://www.xvideosbuceta.com/actor/elisa-sanches/ (qualquer site)"
-                                required
-                            />
-                            <Button type="submit" disabled={discovering || !modelUrl}>
-                                {discovering ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                    <Search className="mr-2 h-4 w-4" />
+
+                        {/* ── URL tab ── */}
+                        {inputMode === 'url' && (
+                            <>
+                                <form onSubmit={handleDiscover} className="flex gap-3">
+                                    <Input
+                                        value={modelUrl}
+                                        onChange={(e) => setModelUrl(e.target.value)}
+                                        placeholder="https://www.xvideosbuceta.com/actor/elisa-sanches/ (qualquer site)"
+                                        required
+                                    />
+                                    <Button type="submit" disabled={discovering || !modelUrl}>
+                                        {discovering ? (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Search className="mr-2 h-4 w-4" />
+                                        )}
+                                        Descobrir
+                                    </Button>
+                                </form>
+                                {discoveryError && <p className="text-sm text-red-600">{discoveryError}</p>}
+                                {discoveredUrls.length > 0 && (
+                                    <div className="space-y-3">
+                                        <p className="text-sm text-green-700 font-medium">
+                                            {discoveredUrls.length} URLs encontradas
+                                        </p>
+                                        <Button onClick={handleStartScraping}>
+                                            Iniciar Scraping
+                                            <ChevronRight className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 )}
-                                Descobrir
-                            </Button>
-                        </form>
-                        {discoveryError && <p className="text-sm text-red-600">{discoveryError}</p>}
-                        {discoveredUrls.length > 0 && (
-                            <div className="space-y-3">
-                                <p className="text-sm text-green-700 font-medium">
-                                     {discoveredUrls.length} URLs encontradas
-                                </p>
-                                <Button onClick={handleStartScraping}>
-                                    Iniciar Scraping
-                                    <ChevronRight className="ml-2 h-4 w-4" />
-                                </Button>
-                            </div>
+                            </>
+                        )}
+
+                        {/* ── JSON tab ── */}
+                        {inputMode === 'json' && (
+                            <>
+                                <input
+                                    ref={jsonFileInputRef}
+                                    type="file"
+                                    accept=".json,application/json"
+                                    className="hidden"
+                                    onChange={handleJsonFileLoad}
+                                />
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => jsonFileInputRef.current?.click()}
+                                    >
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        Carregar arquivo .json
+                                    </Button>
+                                    {jsonText && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-gray-400 hover:text-gray-600"
+                                            onClick={() => { setJsonText(''); setJsonError(null); }}
+                                        >
+                                            <X className="mr-1 h-4 w-4" />
+                                            Limpar
+                                        </Button>
+                                    )}
+                                </div>
+                                <textarea
+                                    value={jsonText}
+                                    onChange={(e) => { setJsonText(e.target.value); setJsonError(null); }}
+                                    placeholder={'Cole aqui o conteúdo do arquivo resultado_TIMESTAMP.json...\n\n{ "videos": [ { "title": "...", "vazounudesUUID": "...", ... } ] }'}
+                                    rows={10}
+                                    className="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 font-mono text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    spellCheck={false}
+                                />
+                                {jsonError && (
+                                    <div className="flex items-center gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                                        <AlertCircle className="h-4 w-4 shrink-0" />
+                                        {jsonError}
+                                    </div>
+                                )}
+                                {jsonText.trim() && (
+                                    <Button onClick={handleImportJson}>
+                                        <FileJson className="mr-2 h-4 w-4" />
+                                        Importar vídeos
+                                    </Button>
+                                )}
+                            </>
                         )}
                     </CardContent>
                 </Card>
             )}
 
+            {/* ── Step 2a: Scraping (URL mode) ───────────────────────────── */}
             {step === 'scraping' && (
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Loader2 className={`h-5 w-5 ${scraping ? 'animate-spin' : ''}`} />
-                            2. Scraping em Andamento...
+                            Scraping em Andamento...
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <p className="text-2xl font-bold tabular-nums">
                             {scrapeProgress}/{discoveredUrls.length}{' '}
-                            <span className="text-base font-normal text-gray-500">({progressPct}%)</span>
+                            <span className="text-base font-normal text-gray-500">({urlProgressPct}%)</span>
                         </p>
                         <div className="h-3 overflow-hidden rounded-full bg-gray-200">
                             <div
                                 className="h-full bg-blue-600 transition-all duration-300"
-                                style={{ width: `${progressPct}%` }}
+                                style={{ width: `${urlProgressPct}%` }}
                             />
                         </div>
                         <p className="text-sm text-gray-600">
-                             Sucesso: {successCount} &nbsp;|&nbsp;  Sem thumbnail: {missingThumbCount} &nbsp;|&nbsp;  Falhas:{' '}
+                            Sucesso: {scrapeSuccessCount} &nbsp;|&nbsp; Sem thumbnail: {scrapeThumbMissing} &nbsp;|&nbsp; Falhas:{' '}
                             {scrapeErrors.length}
                         </p>
                     </CardContent>
                 </Card>
             )}
 
+            {/* ── Step 2b: Importing (JSON mode) ─────────────────────────── */}
+            {step === 'importing' && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Importando vídeos do JSON...
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <p className="text-2xl font-bold tabular-nums">
+                            {importProgress}/{importTotal}{' '}
+                            <span className="text-base font-normal text-gray-500">({jsonProgressPct}%)</span>
+                        </p>
+                        <div className="h-3 overflow-hidden rounded-full bg-gray-200">
+                            <div
+                                className="h-full bg-blue-600 transition-all duration-300"
+                                style={{ width: `${jsonProgressPct}%` }}
+                            />
+                        </div>
+                        <p className="text-sm text-gray-600">
+                            Sucesso: {importSuccessCount} &nbsp;|&nbsp; Falhas: {importErrors.length}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                            Fazendo upload das thumbnails e criando os vídeos no banco...
+                        </p>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* ── Step 3: Review ──────────────────────────────────────────── */}
             {step === 'review' && (
                 <div className="space-y-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>3. Revisão e Publicação</CardTitle>
+                            <CardTitle>Revisão e Publicação</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
 
@@ -732,7 +955,7 @@ export default function BulkImportPage() {
                             {publishResult && (
                                 <div className="rounded border border-green-200 bg-green-50 p-3">
                                     <p className="text-sm font-medium text-green-800">
-                                         Publicados: {publishResult.published} &nbsp;|&nbsp;  Falhas: {publishResult.failed}
+                                        Publicados: {publishResult.published} &nbsp;|&nbsp; Falhas: {publishResult.failed}
                                     </p>
                                     {publishResult.errors.map((err, i) => (
                                         <p key={i} className="text-xs text-red-600 mt-1">{err}</p>
@@ -771,13 +994,13 @@ export default function BulkImportPage() {
                         </CardContent>
                     </Card>
 
-                    {scrapeErrors.length > 0 && (
+                    {activeErrors.length > 0 && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-red-600">Falhas no Scraping</CardTitle>
+                                <CardTitle className="text-red-600">Falhas na Importação</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-1">
-                                {scrapeErrors.map((error, index) => (
+                                {activeErrors.map((error, index) => (
                                     <p key={`${error.url}-${index}`} className="text-sm text-red-600">
                                         <span className="font-mono text-xs text-gray-500">{error.url}</span> — {error.error}
                                     </p>
@@ -786,7 +1009,7 @@ export default function BulkImportPage() {
                         </Card>
                     )}
 
-                    {videos.length === 0 && scrapeErrors.length === 0 && (
+                    {videos.length === 0 && activeErrors.length === 0 && (
                         <Card>
                             <CardContent className="py-8 text-center text-sm text-gray-500">
                                 Nenhum video novo foi importado nesta execucao.

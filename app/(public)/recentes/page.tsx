@@ -1,4 +1,4 @@
-import { VideoGrid } from '@/components/video/video-grid';
+﻿import { VideoGrid } from '@/components/video/video-grid';
 import { Pagination } from '@/components/layout/pagination';
 import { getVideosPaginated } from '@/lib/services/videos';
 import { Clock } from 'lucide-react';
@@ -10,7 +10,7 @@ const ITEMS_PER_PAGE = 20;
 
 export const metadata: Metadata = {
   title: 'Videos Recentes - Porno Gratis',
-  description: 'Os videos porno mais recentes em HD. Assista as ultimas novidades do Club da Putaria.',
+  description: 'Os videos porno mais recentes em HD. Assista as ultimas novidades do Xvideos Prime.',
   alternates: {
     canonical: '/recentes',
   },

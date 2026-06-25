@@ -10,7 +10,6 @@ import {
     Tags,
     LogOut,
     Layers,
-    FileJson,
     Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,7 +18,6 @@ const navigation = [
     { name: 'Dashboard', href: '/backoffice-92', icon: LayoutDashboard },
     { name: 'Vídeos', href: '/backoffice-92/videos', icon: Video },
     { name: 'Importação em Massa', href: '/backoffice-92/videos/bulk-import', icon: Layers },
-    { name: 'Importar JSON Local', href: '/backoffice-92/videos/import-json', icon: FileJson },
     { name: 'Modelos', href: '/backoffice-92/modelos', icon: Users },
     { name: 'Categorias', href: '/backoffice-92/categorias', icon: FolderOpen },
     { name: 'Tags', href: '/backoffice-92/tags', icon: Tags },
@@ -33,7 +31,7 @@ export function AdminSidebar() {
         <div className="flex h-full w-64 flex-col bg-sidebar text-sidebar-foreground">
 
             <div className="flex h-16 items-center justify-center border-b border-sidebar-border">
-                <h1 className="text-xl font-bold">Club da Putaria</h1>
+                <h1 className="text-xl font-bold">Xvideos Prime</h1>
             </div>
 
             <nav className="flex-1 space-y-1 px-2 py-4">

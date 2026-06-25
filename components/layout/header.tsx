@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import ClubLogo from '@/app/logos/clubdaputarialogo';
+﻿import Link from 'next/link';
+import XvideosPrimeLogo from '@/app/logos/xvideosprime-logo';
 import { SearchBar } from './search-bar';
 
 export function Header() {
@@ -8,7 +8,7 @@ export function Header() {
       <div className="container mx-auto flex h-16 md:h-24 items-center justify-between px-4">
 
         <Link href="/" className="flex items-center space-x-2">
-          <ClubLogo className="h-16 md:h-20 w-auto" />
+          <XvideosPrimeLogo className="h-16 md:h-20 w-auto" />
         </Link>
 
         <div className="hidden flex-1 max-w-md mx-8 md:flex">

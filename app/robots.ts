@@ -1,6 +1,6 @@
 ﻿import type { MetadataRoute } from 'next';
 
-const SITE_URL = 'https://www.clubdaputaria.com';
+const SITE_URL = 'https://www.xvideosprime.com';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -23,7 +23,7 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: 'Applebot-Extended', disallow: '/' },
       { userAgent: 'meta-externalagent', disallow: '/' },
     ],
-    host: 'www.clubdaputaria.com',
+    host: 'www.xvideosprime.com',
     sitemap: `${SITE_URL}/sitemap-index.xml`,
   };
 }

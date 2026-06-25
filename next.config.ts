@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+﻿import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
 
       {
         protocol: 'https',
-        hostname: 'thumbs.clubdaputaria.com',
+        hostname: 'thumbs.xvideosprime.com',
       },
 
       {

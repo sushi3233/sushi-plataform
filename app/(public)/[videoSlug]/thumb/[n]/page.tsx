@@ -1,4 +1,4 @@
-import Image from 'next/image';
+﻿import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -29,7 +29,7 @@ export async function generateMetadata({
         if (!video) return { title: 'Vídeo não encontrado' };
 
         const thumbnail = video.thumbnail;
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.clubdaputaria.com';
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.xvideosprime.com';
 
         return {
             title: `${video.metaTitle} - Foto`,

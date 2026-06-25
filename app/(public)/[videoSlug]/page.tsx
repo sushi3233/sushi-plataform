@@ -1,4 +1,4 @@
-import { VideoPlayer } from '@/components/video/video-player';
+﻿import { VideoPlayer } from '@/components/video/video-player';
 import { VideoInfo } from '@/components/video/video-info';
 import { RelatedVideos } from '@/components/video/related-videos';
 import { ShareButton } from '@/components/video/share-button';
@@ -11,7 +11,7 @@ import { getThumbnailUrl } from '@/lib/utils';
 
 export const revalidate = 3600;
 
-const SITE_URL = 'https://www.clubdaputaria.com';
+const SITE_URL = 'https://www.xvideosprime.com';
 
 interface VideoPageProps {
   params: Promise<{
@@ -49,7 +49,7 @@ export async function generateMetadata({
       description: video.metaDescription,
       type: 'video.other',
       url: `${SITE_URL}/${videoSlug}`,
-      siteName: 'Club da Putaria',
+      siteName: 'Xvideos Prime',
       locale: 'pt_BR',
       images: coverThumbnail
         ? [{ url: coverThumbnail, width: 1280, height: 720, alt: video.metaTitle }]
@@ -124,7 +124,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
           },
           publisher: {
             '@type': 'Organization',
-            name: 'Club da Putaria',
+            name: 'Xvideos Prime',
             url: SITE_URL,
             logo: {
               '@type': 'ImageObject',
