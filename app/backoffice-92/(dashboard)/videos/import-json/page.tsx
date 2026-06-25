@@ -1,6 +1,6 @@
-﻿'use client';
+'use client';
 
-import { useCallback, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -10,19 +10,18 @@ import {
     AlertCircle,
     ArrowLeft,
     CheckCircle,
-    ChevronRight,
     Clock,
+    FileJson,
     ImageOff,
     Loader2,
     PlayCircle,
     RotateCcw,
-    Search,
     Send,
     Upload,
     X,
 } from 'lucide-react';
 
-type Step = 'discovery' | 'scraping' | 'review';
+type Step = 'paste' | 'importing' | 'review';
 
 interface ScrapeResultItem {
     url: string;
@@ -43,7 +42,6 @@ interface ImportedVideo {
     models: string;
     categories: string;
     tags: string;
-
     durationSeconds: number;
     durationInput: string;
     hlsUrl: string;
@@ -86,17 +84,14 @@ function getErrorMessage(error: unknown): string {
 function parseTaxonomyInput(input: string): string[] {
     const result: string[] = [];
     const seen = new Set<string>();
-
     for (const rawPart of input.split(/[\n,;]+/)) {
         const normalized = rawPart.replace(/\s+/g, ' ').trim();
         if (!normalized) continue;
-
         const key = normalized.toLocaleLowerCase('pt-BR');
         if (seen.has(key)) continue;
         seen.add(key);
         result.push(normalized);
     }
-
     return result;
 }
 
@@ -104,7 +99,7 @@ function normalizeSlugInput(input: string): string {
     return input
         .toLowerCase()
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[̀-ͯ]/g, '')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/-{2,}/g, '-')
         .replace(/(^-|-$)/g, '');
@@ -128,13 +123,13 @@ function timeStringToSeconds(input: string): number {
     return 0;
 }
 
+const ALLOWED_THUMB_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const MAX_THUMB_SIZE_BYTES = 5 * 1024 * 1024;
+
 interface VideoCardProps {
     video: ImportedVideo;
     onUpdate: (id: string, field: keyof ImportedVideo, value: string | boolean | number | null) => void;
 }
-
-const ALLOWED_THUMB_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-const MAX_THUMB_SIZE_BYTES = 5 * 1024 * 1024;
 
 function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -144,7 +139,6 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
     const handleThumbnailFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
         if (!ALLOWED_THUMB_TYPES.includes(file.type)) {
             setThumbError('Formato inválido. Use JPEG, PNG ou WebP.');
             return;
@@ -153,10 +147,8 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
             setThumbError('Arquivo muito grande. Máximo: 5 MB.');
             return;
         }
-
         setThumbUploading(true);
         setThumbError(null);
-
         try {
             const formData = new FormData();
             formData.append('thumbnail', file);
@@ -166,7 +158,6 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
             });
             const data = (await response.json()) as { url?: string; key?: string; error?: string };
             if (!response.ok) throw new Error(data.error || 'Erro no upload');
-
             onUpdate(video.id, 'thumbnailUrl', data.url ?? '');
             onUpdate(video.id, 'thumbnailKey', data.key ?? '');
             onUpdate(video.id, 'missingThumbnail', false);
@@ -174,7 +165,6 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
             setThumbError(err instanceof Error ? err.message : 'Erro ao fazer upload');
         } finally {
             setThumbUploading(false);
-
             if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
@@ -187,13 +177,8 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    const triggerFileInput = () => {
-        if (!thumbUploading) fileInputRef.current?.click();
-    };
-
     return (
         <div className={`rounded-lg border bg-white shadow-sm ${video.selected ? 'border-blue-300' : 'border-gray-200'}`}>
-
             <input
                 ref={fileInputRef}
                 type="file"
@@ -227,12 +212,9 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
             </div>
 
             <div className="grid gap-4 p-4 md:grid-cols-2">
-
                 <div className="space-y-4">
-
                     <div>
                         <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">Thumbnail (R2)</p>
-
                         {thumbUploading ? (
                             <div className="flex aspect-video items-center justify-center rounded-lg border-2 border-blue-300 bg-blue-50">
                                 <div className="text-center">
@@ -254,14 +236,13 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                                         <p className="truncate text-xs text-white/80">{video.thumbnailUrl}</p>
                                     </div>
                                 </div>
-
                                 <div className="mt-2 flex gap-2">
                                     <Button
                                         type="button"
                                         variant="outline"
                                         size="sm"
                                         className="flex-1 text-xs"
-                                        onClick={triggerFileInput}
+                                        onClick={() => fileInputRef.current?.click()}
                                     >
                                         <Upload className="mr-1.5 h-3 w-3" />
                                         Trocar thumbnail
@@ -272,7 +253,6 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                                         size="sm"
                                         className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                                         onClick={handleRemoveThumbnail}
-                                        title="Remover thumbnail atual"
                                     >
                                         <X className="h-3 w-3" />
                                     </Button>
@@ -281,8 +261,7 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                         ) : (
                             <div
                                 className="flex aspect-video cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-yellow-300 bg-yellow-50 transition-colors hover:border-blue-400 hover:bg-blue-50"
-                                onClick={triggerFileInput}
-                                title="Clique para fazer upload de thumbnail"
+                                onClick={() => fileInputRef.current?.click()}
                             >
                                 <div className="text-center">
                                     <Upload className="mx-auto h-8 w-8 text-gray-400" />
@@ -291,10 +270,7 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                                 </div>
                             </div>
                         )}
-
-                        {thumbError && (
-                            <p className="mt-1.5 text-xs text-red-600">{thumbError}</p>
-                        )}
+                        {thumbError && <p className="mt-1.5 text-xs text-red-600">{thumbError}</p>}
                     </div>
 
                     <div className="space-y-1.5">
@@ -310,15 +286,8 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                                 />
                             </div>
                             {video.hlsUrl && (
-                                <a
-                                    href={video.hlsUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    title="Testar URL no navegador"
-                                >
-                                    <Button type="button" variant="outline" size="sm" className="shrink-0">
-                                        ▶
-                                    </Button>
+                                <a href={video.hlsUrl} target="_blank" rel="noopener noreferrer">
+                                    <Button type="button" variant="outline" size="sm" className="shrink-0">▶</Button>
                                 </a>
                             )}
                         </div>
@@ -339,21 +308,15 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                             onBlur={(e) => {
                                 const secs = timeStringToSeconds(e.target.value);
                                 onUpdate(video.id, 'durationSeconds', secs);
-                                if (secs > 0) {
-                                    onUpdate(video.id, 'durationInput', secondsToTimeString(secs));
-                                }
+                                if (secs > 0) onUpdate(video.id, 'durationInput', secondsToTimeString(secs));
                             }}
                             placeholder="Ex: 12:34 ou 1:02:34"
                             className={`font-mono ${video.durationSeconds === 0 && video.durationInput
-                                ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                                : 'border-gray-300'
-                                }`}
+                                ? 'border-red-300 focus:border-red-500'
+                                : 'border-gray-300'}`}
                         />
                         {video.durationSeconds > 0 && (
                             <p className="text-xs text-gray-500">{video.durationSeconds} segundos</p>
-                        )}
-                        {video.durationSeconds === 0 && video.durationInput && (
-                            <p className="text-xs text-red-500">Formato inválido. Use MM:SS ou H:MM:SS</p>
                         )}
                     </div>
                 </div>
@@ -361,14 +324,13 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                 <div className="space-y-3">
                     <div className="space-y-1.5">
                         <label htmlFor={`slug-${video.id}`} className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            Slug da URL <span className="text-gray-400 font-normal normal-case">editável</span>
+                            Slug <span className="text-gray-400 font-normal normal-case">editável</span>
                         </label>
                         <div className="flex items-center gap-2">
                             <span className="rounded-md border border-gray-200 bg-gray-50 px-2 py-2 text-xs text-gray-500">/</span>
                             <Input
                                 id={`slug-${video.id}`}
                                 value={video.slug}
-                                placeholder="titulo-do-video"
                                 onChange={(e) => onUpdate(video.id, 'slug', e.target.value)}
                                 onBlur={(e) => onUpdate(video.id, 'slug', normalizeSlugInput(e.target.value))}
                                 className="font-mono text-sm"
@@ -378,7 +340,7 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
 
                     <div className="space-y-1.5">
                         <label htmlFor={`metaTitle-${video.id}`} className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            Título SEO (meta title) <span className="text-gray-400 font-normal normal-case">máx 60</span>
+                            Meta título <span className="text-gray-400 font-normal normal-case">máx 60</span>
                         </label>
                         <Input
                             id={`metaTitle-${video.id}`}
@@ -421,7 +383,6 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                         <Input
                             id={`models-${video.id}`}
                             value={video.models}
-                            placeholder="Elisa Sanches, Outra Modelo"
                             onChange={(e) => onUpdate(video.id, 'models', e.target.value)}
                         />
                     </div>
@@ -433,7 +394,6 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                         <Input
                             id={`categories-${video.id}`}
                             value={video.categories}
-                            placeholder="Famosas, Anal, Amador"
                             onChange={(e) => onUpdate(video.id, 'categories', e.target.value)}
                         />
                     </div>
@@ -445,7 +405,6 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
                         <Input
                             id={`tags-${video.id}`}
                             value={video.tags}
-                            placeholder="vazado, caiu na net"
                             onChange={(e) => onUpdate(video.id, 'tags', e.target.value)}
                         />
                     </div>
@@ -455,21 +414,48 @@ function VideoReviewCard({ video, onUpdate }: VideoCardProps) {
     );
 }
 
-export default function BulkImportPage() {
-    const [step, setStep] = useState<Step>('discovery');
-    const [modelUrl, setModelUrl] = useState('');
-    const [discovering, setDiscovering] = useState(false);
-    const [discoveryError, setDiscoveryError] = useState<string | null>(null);
-    const [discoveredUrls, setDiscoveredUrls] = useState<string[]>([]);
+export default function ImportJsonPage() {
+    const [step, setStep] = useState<Step>('paste');
+    const [jsonText, setJsonText] = useState('');
+    const [jsonError, setJsonError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const [scraping, setScraping] = useState(false);
-    const [scrapeProgress, setScrapeProgress] = useState(0);
-    const [scrapeResults, setScrapeResults] = useState<ScrapeResultItem[]>([]);
-    const [scrapeErrors, setScrapeErrors] = useState<ScrapeResultItem[]>([]);
+    const [importProgress, setImportProgress] = useState(0);
+    const [importTotal, setImportTotal] = useState(0);
+    const [importResults, setImportResults] = useState<ScrapeResultItem[]>([]);
+    const [importErrors, setImportErrors] = useState<ScrapeResultItem[]>([]);
 
     const [videos, setVideos] = useState<ImportedVideo[]>([]);
     const [publishing, setPublishing] = useState(false);
     const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
+
+    const handleFileLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            setJsonText((ev.target?.result as string) || '');
+            setJsonError(null);
+        };
+        reader.readAsText(file, 'utf-8');
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const parseJson = (): unknown[] | null => {
+        try {
+            const parsed = JSON.parse(jsonText) as unknown;
+            if (Array.isArray(parsed)) return parsed;
+            if (typeof parsed === 'object' && parsed !== null) {
+                const videos = (parsed as Record<string, unknown>).videos;
+                if (Array.isArray(videos)) return videos;
+            }
+            setJsonError('JSON inválido: esperado um array de vídeos ou { videos: [...] }');
+            return null;
+        } catch {
+            setJsonError('JSON inválido: verifique a formatação');
+            return null;
+        }
+    };
 
     const fetchDraftVideos = useCallback(async (ids: string[]): Promise<ImportedVideo[]> => {
         if (ids.length === 0) return [];
@@ -500,74 +486,65 @@ export default function BulkImportPage() {
         });
     }, []);
 
-    const handleDiscover = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setDiscovering(true);
-        setDiscoveryError(null);
-        setDiscoveredUrls([]);
-        try {
-            const response = await fetch('/api/backoffice-92/scrape/discover', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: modelUrl }),
-            });
-            const data = (await response.json()) as { videoUrls?: string[]; error?: string };
-            if (!response.ok) {
-                setDiscoveryError(data.error || 'Erro ao descobrir videos');
-            } else {
-                setDiscoveredUrls(data.videoUrls || []);
-            }
-        } catch (error: unknown) {
-            setDiscoveryError(getErrorMessage(error));
-        } finally {
-            setDiscovering(false);
+    const handleImport = async () => {
+        setJsonError(null);
+        const rawVideos = parseJson();
+        if (!rawVideos) return;
+        if (rawVideos.length === 0) {
+            setJsonError('Nenhum vídeo encontrado no JSON');
+            return;
         }
-    };
 
-    const handleStartScraping = async () => {
-        if (discoveredUrls.length === 0) return;
-        setStep('scraping');
-        setScraping(true);
-        setScrapeProgress(0);
-        setScrapeResults([]);
-        setScrapeErrors([]);
-        try {
-            const allResults: ScrapeResultItem[] = [];
-            for (let i = 0; i < discoveredUrls.length; i += BATCH_SIZE) {
-                const batch = discoveredUrls.slice(i, i + BATCH_SIZE);
-                const response = await fetch('/api/backoffice-92/scrape/bulk', {
+        setStep('importing');
+        setImportTotal(rawVideos.length);
+        setImportProgress(0);
+        setImportResults([]);
+        setImportErrors([]);
+
+        const allResults: ScrapeResultItem[] = [];
+
+        for (let i = 0; i < rawVideos.length; i += BATCH_SIZE) {
+            const batch = rawVideos.slice(i, i + BATCH_SIZE);
+            try {
+                const response = await fetch('/api/backoffice-92/scrape/import-json', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ urls: batch }),
+                    body: JSON.stringify({ videos: batch }),
                 });
                 const data = (await response.json()) as { results?: ScrapeResultItem[]; error?: string };
                 const batchResults = response.ok && Array.isArray(data.results)
                     ? data.results
-                    : batch.map((url) => ({ url, success: false, error: data.error || 'Erro no lote' }));
+                    : batch.map((_, j) => ({
+                        url: (batch[j] as Record<string, string>)?.url || '',
+                        success: false,
+                        error: data.error || 'Erro no lote',
+                    }));
                 allResults.push(...batchResults);
-                setScrapeProgress(allResults.length);
-                setScrapeResults([...allResults]);
+            } catch (err) {
+                allResults.push(...batch.map((_, j) => ({
+                    url: (batch[j] as Record<string, string>)?.url || '',
+                    success: false,
+                    error: getErrorMessage(err),
+                })));
             }
-            setScrapeErrors(allResults.filter((r) => !r.success));
-            const createdIds = allResults
-                .filter((r) => r.success && r.videoId)
-                .map((r) => r.videoId as string);
-            setVideos(await fetchDraftVideos(createdIds));
-            setStep('review');
-        } catch (error: unknown) {
-            setScrapeErrors([{ url: 'geral', success: false, error: getErrorMessage(error) }]);
-            setStep('review');
-        } finally {
-            setScraping(false);
+            setImportProgress(Math.min(allResults.length, rawVideos.length));
+            setImportResults([...allResults]);
         }
+
+        setImportErrors(allResults.filter((r) => !r.success));
+        const createdIds = allResults
+            .filter((r) => r.success && r.videoId)
+            .map((r) => r.videoId as string);
+        setVideos(await fetchDraftVideos(createdIds));
+        setStep('review');
     };
 
     const updateVideo = (id: string, field: keyof ImportedVideo, value: string | boolean | number | null) => {
-        setVideos((prev) => prev.map((video) => (video.id === id ? { ...video, [field]: value } : video)));
+        setVideos((prev) => prev.map((v) => (v.id === id ? { ...v, [field]: value } : v)));
     };
 
     const handlePublish = async () => {
-        const selected = videos.filter((video) => video.selected);
+        const selected = videos.filter((v) => v.selected);
         if (selected.length === 0) return;
         setPublishing(true);
         setPublishResult(null);
@@ -576,18 +553,18 @@ export default function BulkImportPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    videos: selected.map((video) => ({
-                        id: video.id,
-                        slug: video.slug,
-                        metaTitle: video.metaTitle,
-                        metaDescription: video.metaDescription,
-                        h1Title: video.h1Title || video.metaTitle,
-                        duration: video.durationSeconds,
-                        models: parseTaxonomyInput(video.models),
-                        categories: parseTaxonomyInput(video.categories),
-                        tags: parseTaxonomyInput(video.tags),
-                        thumbnailUrl: video.thumbnailUrl,
-                        thumbnailKey: video.thumbnailKey,
+                    videos: selected.map((v) => ({
+                        id: v.id,
+                        slug: v.slug,
+                        metaTitle: v.metaTitle,
+                        metaDescription: v.metaDescription,
+                        h1Title: v.h1Title || v.metaTitle,
+                        duration: v.durationSeconds,
+                        models: parseTaxonomyInput(v.models),
+                        categories: parseTaxonomyInput(v.categories),
+                        tags: parseTaxonomyInput(v.tags),
+                        thumbnailUrl: v.thumbnailUrl,
+                        thumbnailKey: v.thumbnailKey,
                     })),
                 }),
             });
@@ -608,9 +585,9 @@ export default function BulkImportPage() {
                 errors: data.errors || [],
             });
             const publishedIds = new Set(data.publishedIds || []);
-            setVideos((prev) => prev.filter((video) => !publishedIds.has(video.id)));
-        } catch (error: unknown) {
-            setPublishResult({ published: 0, failed: selected.length, errors: [getErrorMessage(error)] });
+            setVideos((prev) => prev.filter((v) => !publishedIds.has(v.id)));
+        } catch (err) {
+            setPublishResult({ published: 0, failed: selected.length, errors: [getErrorMessage(err)] });
         } finally {
             setPublishing(false);
         }
@@ -618,20 +595,17 @@ export default function BulkImportPage() {
 
     const selectedCount = videos.filter((v) => v.selected).length;
     const blockedSelected = videos.filter((v) => v.selected && v.missingThumbnail).length;
-    const progressPct = discoveredUrls.length
-        ? Math.round((scrapeProgress / discoveredUrls.length) * 100)
-        : 0;
-    const successCount = scrapeResults.filter((r) => r.success).length;
-    const missingThumbCount = scrapeResults.filter((r) => r.success && r.missingThumbnail).length;
     const allSelected = videos.length > 0 && selectedCount === videos.length;
+    const progressPct = importTotal ? Math.round((importProgress / importTotal) * 100) : 0;
+    const successCount = importResults.filter((r) => r.success).length;
+
     const statusHint = useMemo(
-        () => (blockedSelected > 0 ? `${blockedSelected} selecionado(s) serão bloqueados por falta de thumbnail.` : null),
+        () => (blockedSelected > 0 ? `${blockedSelected} selecionado(s) sem thumbnail — não serão publicados.` : null),
         [blockedSelected]
     );
 
     return (
         <div className="space-y-6">
-
             <div className="flex items-center space-x-4">
                 <Link href="/backoffice-92/videos">
                     <Button variant="ghost" size="sm">
@@ -639,9 +613,10 @@ export default function BulkImportPage() {
                     </Button>
                 </Link>
                 <div className="flex-1">
-                    <h1 className="text-3xl font-bold">Importacao em Massa</h1>
+                    <h1 className="text-3xl font-bold">Importar JSON do Scraper</h1>
+                    <p className="text-sm text-gray-500 mt-0.5">Cole ou faça upload do arquivo gerado pelo scraper local</p>
                 </div>
-                {step !== 'discovery' && (
+                {step !== 'paste' && (
                     <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
                         <RotateCcw className="mr-2 h-4 w-4" />
                         Reiniciar
@@ -649,55 +624,82 @@ export default function BulkImportPage() {
                 )}
             </div>
 
-            {step === 'discovery' && (
+            {step === 'paste' && (
                 <Card>
                     <CardHeader>
-                        <CardTitle>1. Discovery — URL da Página da Modelo</CardTitle>
+                        <CardTitle className="flex items-center gap-2">
+                            <FileJson className="h-5 w-5" />
+                            Cole o JSON do scraper
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <form onSubmit={handleDiscover} className="flex gap-3">
-                            <Input
-                                value={modelUrl}
-                                onChange={(e) => setModelUrl(e.target.value)}
-                                placeholder="https://www.xvideosbuceta.com/actor/elisa-sanches/ (qualquer site)"
-                                required
+                        <div className="flex gap-2">
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".json,application/json"
+                                className="hidden"
+                                onChange={handleFileLoad}
                             />
-                            <Button type="submit" disabled={discovering || !modelUrl}>
-                                {discovering ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                    <Search className="mr-2 h-4 w-4" />
-                                )}
-                                Descobrir
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <Upload className="mr-2 h-4 w-4" />
+                                Carregar arquivo .json
                             </Button>
-                        </form>
-                        {discoveryError && <p className="text-sm text-red-600">{discoveryError}</p>}
-                        {discoveredUrls.length > 0 && (
-                            <div className="space-y-3">
-                                <p className="text-sm text-green-700 font-medium">
-                                     {discoveredUrls.length} URLs encontradas
-                                </p>
-                                <Button onClick={handleStartScraping}>
-                                    Iniciar Scraping
-                                    <ChevronRight className="ml-2 h-4 w-4" />
+                            {jsonText && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-gray-400 hover:text-gray-600"
+                                    onClick={() => { setJsonText(''); setJsonError(null); }}
+                                >
+                                    <X className="mr-1 h-4 w-4" />
+                                    Limpar
                                 </Button>
+                            )}
+                        </div>
+
+                        <textarea
+                            value={jsonText}
+                            onChange={(e) => { setJsonText(e.target.value); setJsonError(null); }}
+                            placeholder={'Cole aqui o conteúdo do arquivo resultado_TIMESTAMP.json gerado pelo scraper...\n\nExemplo:\n{\n  "videos": [\n    { "title": "...", "vazounudesUUID": "...", ... }\n  ]\n}'}
+                            rows={12}
+                            className="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 font-mono text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            spellCheck={false}
+                        />
+
+                        {jsonError && (
+                            <div className="flex items-center gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                {jsonError}
                             </div>
+                        )}
+
+                        {jsonText && (
+                            <Button onClick={handleImport} disabled={!jsonText.trim()}>
+                                <FileJson className="mr-2 h-4 w-4" />
+                                Importar vídeos
+                            </Button>
                         )}
                     </CardContent>
                 </Card>
             )}
 
-            {step === 'scraping' && (
+            {step === 'importing' && (
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Loader2 className={`h-5 w-5 ${scraping ? 'animate-spin' : ''}`} />
-                            2. Scraping em Andamento...
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Importando vídeos...
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <p className="text-2xl font-bold tabular-nums">
-                            {scrapeProgress}/{discoveredUrls.length}{' '}
+                            {importProgress}/{importTotal}{' '}
                             <span className="text-base font-normal text-gray-500">({progressPct}%)</span>
                         </p>
                         <div className="h-3 overflow-hidden rounded-full bg-gray-200">
@@ -707,8 +709,10 @@ export default function BulkImportPage() {
                             />
                         </div>
                         <p className="text-sm text-gray-600">
-                             Sucesso: {successCount} &nbsp;|&nbsp;  Sem thumbnail: {missingThumbCount} &nbsp;|&nbsp;  Falhas:{' '}
-                            {scrapeErrors.length}
+                            Sucesso: {successCount} &nbsp;|&nbsp; Falhas: {importErrors.length}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                            Aguarde — fazendo upload das thumbnails e criando os vídeos no banco...
                         </p>
                     </CardContent>
                 </Card>
@@ -718,10 +722,9 @@ export default function BulkImportPage() {
                 <div className="space-y-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>3. Revisão e Publicação</CardTitle>
+                            <CardTitle>Revisão e Publicação</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-
                             {statusHint && (
                                 <div className="flex items-center gap-2 rounded border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800">
                                     <AlertCircle className="h-4 w-4 shrink-0" />
@@ -732,7 +735,7 @@ export default function BulkImportPage() {
                             {publishResult && (
                                 <div className="rounded border border-green-200 bg-green-50 p-3">
                                     <p className="text-sm font-medium text-green-800">
-                                         Publicados: {publishResult.published} &nbsp;|&nbsp;  Falhas: {publishResult.failed}
+                                        Publicados: {publishResult.published} &nbsp;|&nbsp; Falhas: {publishResult.failed}
                                     </p>
                                     {publishResult.errors.map((err, i) => (
                                         <p key={i} className="text-xs text-red-600 mt-1">{err}</p>
@@ -744,16 +747,11 @@ export default function BulkImportPage() {
                                 <button
                                     type="button"
                                     className="text-sm text-blue-600 hover:underline"
-                                    onClick={() =>
-                                        setVideos((prev) => prev.map((v) => ({ ...v, selected: !allSelected })))
-                                    }
+                                    onClick={() => setVideos((prev) => prev.map((v) => ({ ...v, selected: !allSelected })))}
                                 >
                                     {allSelected ? 'Desmarcar todos' : 'Selecionar todos'}
                                 </button>
-                                <Button
-                                    onClick={handlePublish}
-                                    disabled={publishing || selectedCount === 0}
-                                >
+                                <Button onClick={handlePublish} disabled={publishing || selectedCount === 0}>
                                     {publishing ? (
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     ) : (
@@ -771,25 +769,25 @@ export default function BulkImportPage() {
                         </CardContent>
                     </Card>
 
-                    {scrapeErrors.length > 0 && (
+                    {importErrors.length > 0 && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-red-600">Falhas no Scraping</CardTitle>
+                                <CardTitle className="text-red-600">Falhas na Importação</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-1">
-                                {scrapeErrors.map((error, index) => (
-                                    <p key={`${error.url}-${index}`} className="text-sm text-red-600">
-                                        <span className="font-mono text-xs text-gray-500">{error.url}</span> — {error.error}
+                                {importErrors.map((err, i) => (
+                                    <p key={i} className="text-sm text-red-600">
+                                        <span className="font-mono text-xs text-gray-500">{err.url}</span> — {err.error}
                                     </p>
                                 ))}
                             </CardContent>
                         </Card>
                     )}
 
-                    {videos.length === 0 && scrapeErrors.length === 0 && (
+                    {videos.length === 0 && importErrors.length === 0 && (
                         <Card>
                             <CardContent className="py-8 text-center text-sm text-gray-500">
-                                Nenhum video novo foi importado nesta execucao.
+                                Nenhum vídeo novo foi importado.
                             </CardContent>
                         </Card>
                     )}

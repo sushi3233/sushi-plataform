@@ -10,6 +10,7 @@ import {
     Tags,
     LogOut,
     Layers,
+    FileJson,
     Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -18,6 +19,7 @@ const navigation = [
     { name: 'Dashboard', href: '/backoffice-92', icon: LayoutDashboard },
     { name: 'Vídeos', href: '/backoffice-92/videos', icon: Video },
     { name: 'Importação em Massa', href: '/backoffice-92/videos/bulk-import', icon: Layers },
+    { name: 'Importar JSON Local', href: '/backoffice-92/videos/import-json', icon: FileJson },
     { name: 'Modelos', href: '/backoffice-92/modelos', icon: Users },
     { name: 'Categorias', href: '/backoffice-92/categorias', icon: FolderOpen },
     { name: 'Tags', href: '/backoffice-92/tags', icon: Tags },
