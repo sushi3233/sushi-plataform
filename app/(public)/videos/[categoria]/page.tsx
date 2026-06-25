@@ -1,4 +1,4 @@
-﻿import { VideoGrid } from '@/components/video/video-grid';
+import { VideoGrid } from '@/components/video/video-grid';
 import { Pagination } from '@/components/layout/pagination';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';

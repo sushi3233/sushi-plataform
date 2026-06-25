@@ -1,4 +1,4 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import XvideosPrimeLogo from '@/app/logos/xvideosprime-logo';
 import { SearchBar } from './search-bar';
 

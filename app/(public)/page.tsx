@@ -1,4 +1,4 @@
-﻿import { VideoGrid } from '@/components/video/video-grid';
+import { VideoGrid } from '@/components/video/video-grid';
 import { Pagination } from '@/components/layout/pagination';
 import { JsonLd } from '@/components/seo/json-ld';
 import { getMostViewedVideosPaginated } from '@/lib/services/videos';

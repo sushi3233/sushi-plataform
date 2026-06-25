@@ -1,4 +1,4 @@
-﻿import 'dotenv/config';
+import 'dotenv/config';
 import { PrismaClient, VideoStatus } from '@prisma/client';
 import slugify from 'slugify';
 

@@ -1,4 +1,4 @@
-﻿import { VideoPlayer } from '@/components/video/video-player';
+import { VideoPlayer } from '@/components/video/video-player';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getVideoBySlug } from '@/lib/services/videos';

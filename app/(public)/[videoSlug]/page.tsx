@@ -1,4 +1,4 @@
-﻿import { VideoPlayer } from '@/components/video/video-player';
+import { VideoPlayer } from '@/components/video/video-player';
 import { VideoInfo } from '@/components/video/video-info';
 import { RelatedVideos } from '@/components/video/related-videos';
 import { ShareButton } from '@/components/video/share-button';

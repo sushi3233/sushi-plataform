@@ -1,4 +1,4 @@
-﻿import { db as prisma } from '../lib/db';
+import { db as prisma } from '../lib/db';
 
 async function checkVideos() {
     console.log(' Verificando vídeos no banco...\n');

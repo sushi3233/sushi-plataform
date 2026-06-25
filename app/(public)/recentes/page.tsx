@@ -1,4 +1,4 @@
-﻿import { VideoGrid } from '@/components/video/video-grid';
+import { VideoGrid } from '@/components/video/video-grid';
 import { Pagination } from '@/components/layout/pagination';
 import { getVideosPaginated } from '@/lib/services/videos';
 import { Clock } from 'lucide-react';
