@@ -99,7 +99,7 @@ export function Header() {
                     {/* Botão hambúrguer */}
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="shrink-0 text-foreground hover:text-muted-foreground transition-colors"
+                        className="shrink-0 mr-3 text-foreground hover:text-muted-foreground transition-colors"
                         aria-label="Menu"
                     >
                         <Menu className="h-6 w-6" />

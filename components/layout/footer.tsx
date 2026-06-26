@@ -110,13 +110,28 @@ export function Footer() {
           <p>
             © {currentYear} Xvideos Prime. Todos os direitos reservados.
           </p>
-          <p className="text-xs">
-            <strong>Aviso Legal:</strong> Este site contém conteúdo adulto e é
-            destinado apenas para maiores de 18 anos. Todos os modelos têm 18
-            anos ou mais. O acesso é proibido em locais onde o conteúdo adulto é
-            ilegal. Ao acessar este site, você confirma ter 18 anos ou mais e
-            concorda com nossos Termos de Uso.
-          </p>
+          {/* Badges de conformidade */}
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            {/* RTA */}
+            <a href="https://www.rtalabel.org" target="_blank" rel="noopener noreferrer" title="RTA Label">
+              <svg width="48" height="24" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="RTA">
+                <rect width="48" height="24" rx="2" fill="#222"/>
+                <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Arial, sans-serif">RTA</text>
+              </svg>
+            </a>
+            {/* ASACP */}
+            <a href="https://www.asacp.org" target="_blank" rel="noopener noreferrer" title="ASACP">
+              <svg width="56" height="24" viewBox="0 0 56 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="ASACP">
+                <rect width="56" height="24" rx="2" fill="#222"/>
+                <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="9" fontWeight="bold" fontFamily="Arial, sans-serif">ASACP</text>
+              </svg>
+            </a>
+            {/* Badge 18+ */}
+            <div className="flex items-center gap-2 border border-white/20 rounded-full px-4 py-1.5 text-xs text-white/70">
+              <span className="font-bold text-white text-sm">18+</span>
+              <span>Conteúdo proibido para menores de 18 anos.</span>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
