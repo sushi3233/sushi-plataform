@@ -3,16 +3,22 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronDown, Globe, Search } from 'lucide-react';
+import { ChevronDown, Globe, Heart, Search, Star } from 'lucide-react';
 import XvideosPrimeLogo from '@/app/logos/xvideosprime-logo';
 
-const NAV_LINKS = [
-    { label: 'Página Principal', href: '/' },
-    { label: 'Vídeos', href: '/recentes' },
-    { label: 'Categorias', href: '/videos' },
-    { label: 'Estrelas Pornô', href: '/modelos' },
-    { label: 'Bombando', href: '/bombando' },
-    { label: 'Mais Vistos', href: '/mais-vistos' },
+const NAV_LINKS: { label: string; href: string; icon?: 'star' | 'heart' }[] = [
+    { label: 'Pornô Novos',   href: '/recentes',           icon: 'star' },
+    { label: 'Bombando Hoje', href: '/bombando',            icon: 'heart' },
+    { label: 'Pornô Longo',   href: '/videos/porno-longo' },
+    { label: 'Famosas',       href: '/videos/famosas' },
+    { label: 'Lésbicas',      href: '/videos/lesbicas' },
+    { label: 'Boquetes',      href: '/videos/boquetes' },
+    { label: 'Anal',          href: '/videos/anal' },
+    { label: 'Gostosas',      href: '/videos/gostosas' },
+    { label: 'Novinhas',      href: '/videos/novinhas' },
+    { label: 'Coroas',        href: '/videos/coroas' },
+    { label: 'Bucetas',       href: '/videos/bucetas' },
+    { label: 'Peitudas',      href: '/videos/peitudas' },
 ];
 
 const LANGUAGES = [
@@ -58,7 +64,7 @@ export function Header() {
         <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 
             {/* ── Linha superior: Logo + Busca + Idioma ── */}
-            <div className="container mx-auto flex items-center gap-4 px-4 py-2.5">
+            <div className="flex items-center justify-center gap-3 px-4 py-2.5">
 
                 {/* Logo */}
                 <Link href="/" className="shrink-0">
@@ -66,7 +72,7 @@ export function Header() {
                 </Link>
 
                 {/* Barra de busca com ícone à esquerda */}
-                <form onSubmit={handleSearch} className="flex flex-1 min-w-0 max-w-2xl mx-auto relative">
+                <form onSubmit={handleSearch} className="relative w-72 md:w-96 shrink-0">
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <input
                         type="search"
@@ -113,18 +119,20 @@ export function Header() {
             </div>
 
             {/* ── Nav inferior ── */}
-            <div className="border-t border-border">
+            <div>
                 <nav className="container mx-auto flex items-center overflow-x-auto scrollbar-hide px-4">
                     {NAV_LINKS.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
-                            className={`shrink-0 px-3 md:px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors border-b-2 ${
+                            className={`shrink-0 flex items-center gap-1 px-3 md:px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors border-b-2 ${
                                 isActive(link.href)
                                     ? 'text-[#b40200] border-[#b40200]'
                                     : 'text-muted-foreground border-transparent hover:text-foreground hover:border-border'
                             }`}
                         >
+                            {link.icon === 'star' && <Star className="h-3 w-3" />}
+                            {link.icon === 'heart' && <Heart className="h-3 w-3" />}
                             {link.label}
                         </Link>
                     ))}
