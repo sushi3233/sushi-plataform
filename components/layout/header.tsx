@@ -54,12 +54,19 @@ export function Header() {
     const [activeLang, setActiveLang] = useState(LANGUAGES[0]);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [catsOpen, setCatsOpen] = useState(false);
+    const [suggestions, setSuggestions] = useState<{ text: string; type: string; image: string | null }[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const langRef = useRef<HTMLDivElement>(null);
+    const searchRef = useRef<HTMLDivElement>(null);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
             if (langRef.current && !langRef.current.contains(e.target as Node)) {
                 setLangOpen(false);
+            }
+            if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+                setShowSuggestions(false);
             }
         };
         document.addEventListener('mousedown', handler);
@@ -75,11 +82,36 @@ export function Header() {
         return () => { document.body.style.overflow = ''; };
     }, [sidebarOpen]);
 
+    const handleQueryChange = (value: string) => {
+        setQuery(value);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (value.trim().length < 2) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+        debounceRef.current = setTimeout(async () => {
+            try {
+                const res = await fetch(`/api/busca/sugestoes?q=${encodeURIComponent(value.trim())}`);
+                const data = await res.json();
+                setSuggestions(data.suggestions ?? []);
+                setShowSuggestions((data.suggestions ?? []).length > 0);
+            } catch {}
+        }, 280);
+    };
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
+        setShowSuggestions(false);
         if (query.trim()) {
             router.push(`/busca?q=${encodeURIComponent(query.trim())}`);
         }
+    };
+
+    const selectSuggestion = (s: string) => {
+        setQuery(s);
+        setShowSuggestions(false);
+        router.push(`/busca?q=${encodeURIComponent(s)}`);
     };
 
     const isActive = (href: string) => {
@@ -111,16 +143,63 @@ export function Header() {
                     </Link>
 
                     {/* Barra de busca com ícone à esquerda */}
-                    <form onSubmit={handleSearch} className="relative w-80 md:w-[28rem] shrink-0">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input
-                            type="search"
-                            placeholder="Buscar por: negão, ninfeta, gozada... ou Nome da Modelo"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            className="w-full bg-muted text-foreground placeholder-muted-foreground pl-10 pr-4 py-2.5 rounded-full outline-none text-sm focus:ring-2 focus:ring-[#b40200] transition"
-                        />
-                    </form>
+                    <div ref={searchRef} className="relative w-80 md:w-[28rem] shrink-0">
+                        <form onSubmit={handleSearch}>
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                            <input
+                                type="search"
+                                placeholder="Buscar por: negão, ninfeta, gozada... ou Nome da Modelo"
+                                value={query}
+                                onChange={(e) => handleQueryChange(e.target.value)}
+                                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                                className="w-full bg-muted text-foreground placeholder-muted-foreground pl-10 pr-4 py-2.5 rounded-full outline-none text-sm focus:ring-2 focus:ring-[#b40200] transition"
+                            />
+                        </form>
+
+                        {/* Dropdown de sugestões */}
+                        {showSuggestions && (
+                            <div className="absolute top-full left-0 right-0 mt-1.5 bg-popover border border-border rounded-xl shadow-2xl z-50 overflow-hidden">
+                                {suggestions.map((s) => (
+                                    <button
+                                        key={s.text}
+                                        onMouseDown={(e) => { e.preventDefault(); selectSuggestion(s.text); }}
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-left hover:bg-muted transition-colors"
+                                    >
+                                        {/* Imagem / avatar */}
+                                        <span className="shrink-0">
+                                            {s.image ? (
+                                                s.type === 'model' ? (
+                                                    <img
+                                                        src={s.image}
+                                                        alt={s.text}
+                                                        className="h-9 w-9 rounded-full object-cover border border-border"
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        src={s.image}
+                                                        alt={s.text}
+                                                        className="h-9 w-16 rounded object-cover border border-border"
+                                                    />
+                                                )
+                                            ) : (
+                                                <span className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
+                                                    <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                                                </span>
+                                            )}
+                                        </span>
+
+                                        {/* Texto + tipo */}
+                                        <span className="flex-1 min-w-0">
+                                            <span className="block truncate font-medium">{s.text}</span>
+                                            <span className="text-xs text-muted-foreground capitalize">
+                                                {s.type === 'model' ? 'Modelo' : s.type === 'video' ? 'Vídeo' : 'Categoria'}
+                                            </span>
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     {/* Seletor de idioma */}
                     <div ref={langRef} className="relative shrink-0">
