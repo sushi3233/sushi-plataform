@@ -142,3 +142,24 @@ model Setting {
 
   @@map("settings")
 }
+
+enum MessageStatus {
+  UNREAD
+  READ
+  REPLIED
+
+  @@map("message_status")
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  nome      String
+  email     String
+  assunto   String
+  mensagem  String        @db.Text
+  status    MessageStatus @default(UNREAD)
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  @@index([status, createdAt(sort: Desc)])
+  @@map("contact_messages")
+}
