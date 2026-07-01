@@ -115,7 +115,7 @@ export function Header() {
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                         <input
                             type="search"
-                            placeholder="Buscar vídeos..."
+                            placeholder="Buscar por: negão, ninfeta, gozada... ou Nome da Modelo"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             className="w-full bg-muted text-foreground placeholder-muted-foreground pl-10 pr-4 py-2.5 rounded-full outline-none text-sm focus:ring-2 focus:ring-[#b40200] transition"
