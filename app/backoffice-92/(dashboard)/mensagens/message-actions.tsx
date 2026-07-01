@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageStatus } from '@prisma/client';
 import { Mail, CheckCheck, Trash2 } from 'lucide-react';
 
-export function MessageActions({ id, status, email }: { id: string; status: MessageStatus; email: string }) {
+export function MessageActions({ id, status, email }: { id: string; status: string; email: string }) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
@@ -29,7 +28,7 @@ export function MessageActions({ id, status, email }: { id: string; status: Mess
             >
                 <Mail className="h-4 w-4" />
             </a>
-            {status !== 'READ' && status !== 'REPLIED' && (
+            {status === 'UNREAD' && (
                 <button
                     onClick={() => update('read')}
                     disabled={loading}
