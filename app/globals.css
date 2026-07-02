@@ -2,7 +2,7 @@
 
 /* Botão X da barra de pesquisa — branco */
 input[type="search"]::-webkit-search-cancel-button {
-    filter: invert(1) brightness(2);
+    filter: invert(1) grayscale(1) brightness(10);
     cursor: pointer;
 }
 @plugin "tailwindcss-animate";

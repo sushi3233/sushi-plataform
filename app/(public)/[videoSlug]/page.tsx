@@ -2,6 +2,7 @@ import { VideoPlayer } from '@/components/video/video-player';
 import { VideoInfo } from '@/components/video/video-info';
 import { RelatedVideos } from '@/components/video/related-videos';
 import { ShareButton } from '@/components/video/share-button';
+import { RequestVideoForm } from '@/components/video/request-video-form';
 import { JsonLd } from '@/components/seo/json-ld';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -193,6 +194,8 @@ export default async function VideoPage({ params }: VideoPageProps) {
           url={`${SITE_URL}/${videoSlug}`}
           title={video.metaTitle || 'Vídeo'}
         />
+
+        <RequestVideoForm videoSlug={videoSlug} />
 
         {relatedVideoCards.length > 0 && (
           <RelatedVideos videos={relatedVideoCards} />

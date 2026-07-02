@@ -12,6 +12,7 @@ import {
     Layers,
     Settings,
     MessageSquare,
+    Inbox,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +24,7 @@ const navigation = [
     { name: 'Categorias', href: '/backoffice-92/categorias', icon: FolderOpen },
     { name: 'Tags', href: '/backoffice-92/tags', icon: Tags },
     { name: 'Mensagens', href: '/backoffice-92/mensagens', icon: MessageSquare },
+    { name: 'Solicitações', href: '/backoffice-92/solicitacoes', icon: Inbox },
     { name: 'Configurações', href: '/backoffice-92/configuracoes', icon: Settings },
 ];
 

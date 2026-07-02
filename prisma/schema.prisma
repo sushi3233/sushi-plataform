@@ -151,6 +151,18 @@ enum MessageStatus {
   @@map("message_status")
 }
 
+model VideoRequest {
+  id        String   @id @default(cuid())
+  modelName String   @map("model_name")
+  details   String?  @db.Text
+  videoSlug String?  @map("video_slug")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)])
+  @@map("video_requests")
+}
+
 model ContactMessage {
   id        String        @id @default(cuid())
   nome      String
